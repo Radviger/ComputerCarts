@@ -5,7 +5,7 @@
   },
   "variants":{
     "normal":{
-      "model":"computercases:network_rail_base"
+      "model":"computercarts:network_rail_base"
     }
   }
 }
