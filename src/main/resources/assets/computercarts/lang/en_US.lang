@@ -1,0 +1,60 @@
+itemGroup.computercarts=ComputerCarts
+
+#Item Names
+item.computercarts.computer_cart.name=Computer Cart
+item.computercarts.computer_cart_case.name=Computercart Case
+item.computercarts.remote_module.name=Remote Module
+item.computercarts.remote_analyzer.name=Remote Module Analyzer
+item.computercarts.linking_upgrade.name=Minecart Linking Upgrade
+
+#Block Names
+tile.computercarts.network_rail.name=Network Rail
+tile.computercarts.network_rail_base.name=Network Rail Controller
+
+#Entity Names
+entity.computercarts.computer_cart.name=Computer Cart
+
+#GUI Text (Head)
+gui.computercarts.network_rail_base.title=Network Rail Controller
+gui.computercarts.manual=OC-Minecarts
+gui.computercarts.remmconf=Remote Module Config
+
+#GUI Text
+gui.computercarts.network_rail_base.info=Connection Type
+gui.computercarts.general.confirm=Confirm
+gui.computercarts.general.success=Success
+gui.computercarts.general.failed=Failed!
+gui.computercarts.remotem.chpass=Change Password:
+gui.computercarts.remotem.remmodule=Remove Module
+
+#Tooltip for Items
+tooltip.computercarts.instcomponents=Installed Components
+tooltip.computercarts.viewcomponents=Hold %s to view installed components.
+tooltip.computercarts.moreinfo=Hold %s to see more informations.
+tooltip.computercarts.emblem=Emblem:
+tooltip.computercarts.tier1=(Tier 1)
+tooltip.computercarts.tier2=(Tier 2)
+tooltip.computercarts.tier3=(Tier 3)
+tooltip.computercarts.tier4=(Creative)
+
+#Tooltip for Items (item descriptions)
+tooltip.computercarts.remote_module.desc=You can install this item by right clicking a compatible cart. It allows you to control Locomotives
+tooltip.computercarts.remote_analyzer.desc=Right Click on a cart with a remote module to get informations like address, ports, ... Press Control + Shift to copy the address
+tooltip.computercarts.linking_upgrade.desc=Provides the "cartlinking" component. Allows computer carts to link and unlink other minecarts to the train.
+
+#Tooltip for GUIs
+tooltip.computercarts.gui.turnon=Turn on
+tooltip.computercarts.gui.turnoff=Turn off
+tooltip.computercarts.gui.useanalyzer=Use an Analyzer to troubleshoot errors.
+tooltip.computercarts.storedenergy=Stored Energy
+tooltip.computercarts.address=Address
+tooltip.computercarts.gui.chpass=Change Password
+tooltip.computercarts.gui.empass=Empty Password for no Password.
+tooltip.computercarts.gui.lockbtn=Click to Lock/Unlock the module.
+
+#Chat messages
+chat.computercarts.invalidcart=Incompatible cart
+chat.computercarts.moduleinstalled=Successfully installed the Remote Module
+chat.computercarts.hasmodule=This cart already has a remote module
+chat.computercarts.clipboard=Copied to Clipboard
+chat.computercarts.owneronly=Only the owner or an admin can access that.

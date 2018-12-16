@@ -1,0 +1,24 @@
+{
+  "key": {
+    "X": {
+      "item": "opencomputers:case3"
+    },
+    "Y": {
+      "item": "minecraft:minecart"
+    },
+    "Z": {
+      "item": "opencomputers:cable"
+    }
+  },
+  "pattern": [
+    "X",
+    "Y",
+    "Z"
+  ],
+  "result": {
+    "count": 1,
+    "item": "computercarts:computer_cart_case",
+    "data": 2
+  },
+  "type": "minecraft:crafting_shaped"
+}

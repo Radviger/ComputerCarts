@@ -1,0 +1,33 @@
+{
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "C": {
+      "item": "opencomputers:chip1"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "G": {
+      "item": "opencomputers:generatorupgrade"
+    },
+    "W": {
+      "item": "opencomputers:wlancard1"
+    },
+    "B": {
+      "item": "opencomputers:printedcircuitboard"
+    }
+  },
+  "pattern": [
+    "IC ",
+    "IBR",
+    "IGW"
+  ],
+  "result": {
+    "count": 1,
+    "item": "computercarts:remote_module",
+    "data": 0
+  },
+  "type": "minecraft:crafting_shaped"
+}

@@ -1,0 +1,32 @@
+{
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "c": {
+      "item": "opencomputers:chamelium"
+    },
+    "S": {
+      "item": "opencomputers:lancard"
+    },
+    "M": {
+      "item": "opencomputers:chip2"
+    },
+    "K": {
+      "item": "opencomputers:cable"
+    },
+    "B": {
+      "item": "opencomputers:printedcircuitboard"
+    }
+  },
+  "pattern": [
+    "CSC",
+    "MBM",
+    "IKI"
+  ],
+  "result": {
+    "count": 1,
+    "item": "computercarts:network_rail_base"
+  },
+  "type": "minecraft:crafting_shaped"
+}

@@ -1,0 +1,38 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {
+      "rail": "computercarts:blocks/network_rail"
+    },
+    "model": "normal_rail_flat"
+  },
+  "variants": {
+    "inventory": {
+      "model": "builtin/generated",
+      "transform": "forge:default-item",
+      "textures": {
+        "layer0": "computercarts:blocks/network_rail"
+      }
+    },
+    "shape": {
+      "north_south": {},
+      "east_west": {
+        "y": 90
+      },
+      "ascending_east": {
+        "model": "normal_rail_raised_ne",
+        "y": 90
+      },
+      "ascending_west": {
+        "model": "normal_rail_raised_sw",
+        "y": 90
+      },
+      "ascending_north": {
+        "model": "normal_rail_raised_ne"
+      },
+      "ascending_south": {
+        "model": "normal_rail_raised_sw"
+      }
+    }
+  }
+}

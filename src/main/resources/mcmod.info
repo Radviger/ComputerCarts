@@ -1,13 +1,13 @@
 [
 {
-  "modid": "ocminecart",
-  "name": "OC-Minecarts",
+  "modid": "computercarts",
+  "name": "ComputerCarts",
   "description": "Adds Computer in a Minecart and more.",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
+  "version": "${mod_version}",
+  "mcversion": "${mc_version}",
   "url": "http://oc.cil.li",
   "updateUrl": "",
-  "authorList": ["feldim2425"],
+  "authorList": ["feldim2425", "Radviger"],
   "credits": "Sangar (OpenComputers+API), CovertJaguar (Railcraft+API)",
   "logoFile": "",
   "screenshots": [],

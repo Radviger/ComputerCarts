@@ -1,0 +1,23 @@
+{
+  "key": {
+    "A": {
+      "item": "opencomputers:analyzer"
+    },
+    "C": {
+      "item": "opencomputers:chip2"
+    },
+    "W": {
+      "item": "opencomputers:wlancard1"
+    }
+  },
+  "pattern": [
+    "W",
+    "C",
+    "A"
+  ],
+  "result": {
+    "count": 1,
+    "item": "computercarts:analyzer"
+  },
+  "type": "minecraft:crafting_shaped"
+}

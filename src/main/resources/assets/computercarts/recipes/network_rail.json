@@ -1,0 +1,17 @@
+{
+  "ingredients": [
+    {
+      "item": "opencomputers:cable"
+    },
+    {
+      "item": "minecraft:redstone"
+    },
+    {
+      "item": "minecraft:detector_rail"
+    }
+  ],
+  "result": {
+    "item": "computercarts:network_rail"
+  },
+  "type": "minecraft:crafting_shapeless"
+}
