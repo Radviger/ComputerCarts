@@ -1,7 +1,8 @@
 {
   "ingredients": [
     {
-      "item": "opencomputers:cable"
+      "item": "opencomputers:cable",
+      "data": 0
     },
     {
       "item": "minecraft:redstone"

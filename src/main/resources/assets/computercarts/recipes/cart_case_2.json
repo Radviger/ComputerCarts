@@ -1,13 +1,15 @@
 {
   "key": {
     "X": {
-      "item": "opencomputers:case3"
+      "item": "opencomputers:case3",
+      "data": 0
     },
     "Y": {
       "item": "minecraft:minecart"
     },
     "Z": {
-      "item": "opencomputers:cable"
+      "item": "opencomputers:cable",
+      "data": 0
     }
   },
   "pattern": [

@@ -13,7 +13,8 @@
       "item": "opencomputers:chip2"
     },
     "K": {
-      "item": "opencomputers:cable"
+      "item": "opencomputers:cable",
+      "data": 0
     },
     "B": {
       "item": "opencomputers:printedcircuitboard"
