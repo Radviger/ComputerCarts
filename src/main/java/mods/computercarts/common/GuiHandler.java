@@ -1,8 +1,8 @@
 package mods.computercarts.common;
 
-import mods.computercarts.client.gui.ComputerCartGui;
-import mods.computercarts.client.gui.NetworkRailBaseGui;
-import mods.computercarts.client.gui.RemoteModuleGui;
+import mods.computercarts.client.gui.GuiComputerCart;
+import mods.computercarts.client.gui.GuiNetworkRailBase;
+import mods.computercarts.client.gui.GuiRemoteModule;
 import mods.computercarts.common.container.ComputerCartContainer;
 import mods.computercarts.common.container.NetworkRailBaseContainer;
 import mods.computercarts.common.container.RemoteModuleContainer;
@@ -58,7 +58,7 @@ public class GuiHandler implements IGuiHandler {
                 switch (ID) {
                     case 0:
                         if (entity instanceof TileEntityNetworkRailBase)
-                            return new NetworkRailBaseGui(player.inventory, (TileEntityNetworkRailBase) entity);
+                            return new GuiNetworkRailBase(player.inventory, (TileEntityNetworkRailBase) entity);
                 }
             }
         } else {
@@ -67,11 +67,11 @@ public class GuiHandler implements IGuiHandler {
                 switch (ID) {
                     case 1:
                         if (entity instanceof EntityComputerCart)
-                            return new ComputerCartGui(player.inventory, (EntityComputerCart) entity);
+                            return new GuiComputerCart(player.inventory, (EntityComputerCart) entity);
                         break;
                     case 2:
                         if (entity instanceof EntityMinecart) {
-                            return new RemoteModuleGui();
+                            return new GuiRemoteModule();
                         }
                 }
             }

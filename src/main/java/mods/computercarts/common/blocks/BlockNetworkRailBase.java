@@ -16,9 +16,9 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class NetworkRailBase extends BlockContainer {
+public class BlockNetworkRailBase extends BlockContainer {
 
-    protected NetworkRailBase() {
+    protected BlockNetworkRailBase() {
         super(Material.IRON);
         this.setUnlocalizedName(ComputerCarts.MODID + ".network_rail_base");
         this.setRegistryName("network_rail_base");

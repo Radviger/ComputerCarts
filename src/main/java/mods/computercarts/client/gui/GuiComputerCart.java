@@ -51,7 +51,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-public class ComputerCartGui extends GuiContainer {
+public class GuiComputerCart extends GuiContainer {
 
     //Resources
     private ResourceLocation textureNoScreen = new ResourceLocation(Settings.OC_ResLoc, "textures/gui/robot_noscreen.png");
@@ -90,7 +90,7 @@ public class ComputerCartGui extends GuiContainer {
 
 //-------Init functions-------//
 
-    public ComputerCartGui(InventoryPlayer inventory, EntityComputerCart entity) {
+    public GuiComputerCart(InventoryPlayer inventory, EntityComputerCart entity) {
         super(new ComputerCartContainer(inventory, entity));
         this.container = (ComputerCartContainer) this.inventorySlots;
 
@@ -408,7 +408,7 @@ public class ComputerCartGui extends GuiContainer {
     }
 
     private boolean isSelectiveSlot(Slot slot) {
-        return slot instanceof ComponentSlot;
+        return slot instanceof SlotComponent;
     }
 
     //Draw Screen if there is one

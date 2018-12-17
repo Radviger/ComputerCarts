@@ -26,12 +26,12 @@ import java.util.List;
 /*
  * Copy from li.cil.oc.server.component.CraftingUpgrade
  */
-public class CraftingUpgradeCC extends AbstractManagedEnvironment {
+public class CraftingUpgrade extends AbstractManagedEnvironment {
 
     private ComputerCart cart;
     private CraftingInventory cinv;
 
-    public CraftingUpgradeCC(ComputerCart cart) {
+    public CraftingUpgrade(ComputerCart cart) {
         super();
         this.cart = cart;
         this.cinv = new CraftingInventory();
@@ -59,15 +59,15 @@ public class CraftingUpgradeCC extends AbstractManagedEnvironment {
         public Object[] craft(int wcount) {
             load();
             int ccount = 0;
-            boolean valid = CraftingManager.findMatchingRecipe(this, CraftingUpgradeCC.this.cart.world()) != null;
+            boolean valid = CraftingManager.findMatchingRecipe(this, CraftingUpgrade.this.cart.world()) != null;
             if (valid) {
                 while (ccount < wcount) {
-                    IRecipe result = CraftingManager.findMatchingRecipe(this, CraftingUpgradeCC.this.cart.world());
+                    IRecipe result = CraftingManager.findMatchingRecipe(this, CraftingUpgrade.this.cart.world());
                     if (result == null) break;
                     ItemStack output = result.getRecipeOutput();
                     if (output.isEmpty()) break;
                     ccount += output.getCount();
-                    FMLCommonHandler.instance().firePlayerCraftingEvent(CraftingUpgradeCC.this.cart.player(), output, this);
+                    FMLCommonHandler.instance().firePlayerCraftingEvent(CraftingUpgrade.this.cart.player(), output, this);
                     List<ItemStack> citems = new ArrayList<>();
                     for (int slot = 0; slot < this.getSizeInventory(); slot++) {
                         ItemStack stack = this.getStackInSlot(slot);
@@ -75,7 +75,7 @@ public class CraftingUpgradeCC extends AbstractManagedEnvironment {
                         if (!stack.isEmpty() && stack.getItem().hasContainerItem(stack)) {
                             ItemStack container = stack.getItem().getContainerItem(stack);
                             if (container.isItemStackDamageable() && container.getItemDamage() > container.getMaxDamage()) {
-                                MinecraftForge.EVENT_BUS.post(new PlayerDestroyItemEvent(CraftingUpgradeCC.this.cart.player(), container, EnumHand.MAIN_HAND));
+                                MinecraftForge.EVENT_BUS.post(new PlayerDestroyItemEvent(CraftingUpgrade.this.cart.player(), container, EnumHand.MAIN_HAND));
                             } else if (!getStackInSlot(slot).isEmpty()) {
                                 citems.add(container);
                             } else {
@@ -85,9 +85,9 @@ public class CraftingUpgradeCC extends AbstractManagedEnvironment {
                     }
 
                     save();
-                    InventoryUtil.addToPlayerInventory(output, CraftingUpgradeCC.this.cart.player());
+                    InventoryUtil.addToPlayerInventory(output, CraftingUpgrade.this.cart.player());
                     for (ItemStack stack : citems) {
-                        InventoryUtil.addToPlayerInventory(stack, CraftingUpgradeCC.this.cart.player());
+                        InventoryUtil.addToPlayerInventory(stack, CraftingUpgrade.this.cart.player());
                     }
                     load();
                 }
@@ -96,7 +96,7 @@ public class CraftingUpgradeCC extends AbstractManagedEnvironment {
         }
 
         private void load() {
-            IInventory hinv = CraftingUpgradeCC.this.cart.mainInventory();
+            IInventory hinv = CraftingUpgrade.this.cart.mainInventory();
             this.possibleAmount = Integer.MAX_VALUE;
             for (int slot = 0; slot < this.getSizeInventory(); slot++) {
                 ItemStack stack = hinv.getStackInSlot(toParentSlot(slot));
@@ -108,7 +108,7 @@ public class CraftingUpgradeCC extends AbstractManagedEnvironment {
         }
 
         private void save() {
-            IInventory hinv = CraftingUpgradeCC.this.cart.mainInventory();
+            IInventory hinv = CraftingUpgrade.this.cart.mainInventory();
             for (int slot = 0; slot < this.getSizeInventory(); slot++) {
                 hinv.setInventorySlotContents(toParentSlot(slot), this.getStackInSlot(slot));
             }

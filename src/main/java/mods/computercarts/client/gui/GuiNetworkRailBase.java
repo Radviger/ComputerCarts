@@ -5,7 +5,7 @@ import li.cil.oc.integration.util.ItemSearch$;
 import mezz.jei.api.IItemListOverlay;
 import mezz.jei.api.IJeiRuntime;
 import mods.computercarts.ComputerCarts;
-import mods.computercarts.client.gui.widget.ComponentSlot;
+import mods.computercarts.client.gui.widget.SlotComponent;
 import mods.computercarts.common.container.NetworkRailBaseContainer;
 import mods.computercarts.common.tileentity.TileEntityNetworkRailBase;
 import mods.computercarts.network.ModNetwork;
@@ -31,7 +31,7 @@ import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
-public class NetworkRailBaseGui extends GuiContainer {
+public class GuiNetworkRailBase extends GuiContainer {
 
     public static final ResourceLocation texture = new ResourceLocation(ComputerCarts.MODID, "textures/gui/netrailbasegui.png");
 
@@ -45,7 +45,7 @@ public class NetworkRailBaseGui extends GuiContainer {
     private ItemStack hoveredJEI = ItemStack.EMPTY;
 
 
-    public NetworkRailBaseGui(InventoryPlayer inventory, TileEntityNetworkRailBase entity) {
+    public GuiNetworkRailBase(InventoryPlayer inventory, TileEntityNetworkRailBase entity) {
         super(new NetworkRailBaseContainer(inventory, entity));
         this.player = inventory.player;
 
@@ -205,7 +205,7 @@ public class NetworkRailBaseGui extends GuiContainer {
     }
 
     private boolean isSelectiveSlot(Slot slot) {
-        return slot instanceof ComponentSlot;
+        return slot instanceof SlotComponent;
     }
 
 }

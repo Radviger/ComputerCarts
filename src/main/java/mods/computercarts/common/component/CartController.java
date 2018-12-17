@@ -23,12 +23,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ComputerCartController implements ManagedEnvironment {
+public class CartController implements ManagedEnvironment {
 
     private Node node;
     private EntityComputerCart cart;
 
-    public ComputerCartController(EntityComputerCart cart) {
+    public CartController(EntityComputerCart cart) {
         this.cart = cart;
         node = API.network.newNode(this, Visibility.Neighbors).withComponent("computercart").create();
     }

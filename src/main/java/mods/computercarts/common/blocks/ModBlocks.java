@@ -17,8 +17,8 @@ public class ModBlocks {
     public static void init() {
         GameRegistry.registerTileEntity(TileEntityNetworkRailBase.class, new ResourceLocation(ComputerCarts.MODID, "network_rail_base"));
 
-        NETWORK_RAIL = registerBlockWithItem(new NetworkRail(), ItemBlock::new);
-        NETWORK_RAIL_BASE = registerBlockWithItem(new NetworkRailBase(), ItemBlock::new);
+        NETWORK_RAIL = registerBlockWithItem(new BlockNetworkRail(), ItemBlock::new);
+        NETWORK_RAIL_BASE = registerBlockWithItem(new BlockNetworkRailBase(), ItemBlock::new);
     }
 
     private static <B extends Block> B registerBlock(B block) {

@@ -10,14 +10,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Objects;
 
-public abstract class ComponentSlot extends Slot {
+public abstract class SlotComponent extends Slot {
 
     protected EntityPlayer player;
     protected Container container;
     protected String slot;
     protected int tier;
 
-    public ComponentSlot(IInventory inventory, int id, int x, int y, EntityPlayer player, Container container, int tier, String type) {
+    public SlotComponent(IInventory inventory, int id, int x, int y, EntityPlayer player, Container container, int tier, String type) {
         super(inventory, id, x, y);
         this.container = container;
         this.player = player;
@@ -38,8 +38,8 @@ public abstract class ComponentSlot extends Slot {
     public ItemStack onTake(EntityPlayer player, ItemStack stack) {
         ItemStack result = super.onTake(player, stack);
         for (Slot slot : container.inventorySlots) {
-            if (slot instanceof ComponentSlot) {
-                ((ComponentSlot) slot).clearIfInvalid(player);
+            if (slot instanceof SlotComponent) {
+                ((SlotComponent) slot).clearIfInvalid(player);
             }
         }
         return result;
@@ -49,8 +49,8 @@ public abstract class ComponentSlot extends Slot {
     public void onSlotChanged() {
         super.onSlotChanged();
         for (Slot slot : container.inventorySlots) {
-            if (slot instanceof ComponentSlot) {
-                ((ComponentSlot) slot).clearIfInvalid(player);
+            if (slot instanceof SlotComponent) {
+                ((SlotComponent) slot).clearIfInvalid(player);
             }
         }
     }

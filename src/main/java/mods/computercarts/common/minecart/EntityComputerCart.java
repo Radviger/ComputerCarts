@@ -19,7 +19,7 @@ import mods.computercarts.ComputerCarts;
 import mods.computercarts.Settings;
 import mods.computercarts.common.SyncEntity;
 import mods.computercarts.common.blocks.NetRail;
-import mods.computercarts.common.component.ComputerCartController;
+import mods.computercarts.common.component.CartController;
 import mods.computercarts.common.driver.CustomDriver;
 import mods.computercarts.common.inventory.ComponentInventory;
 import mods.computercarts.common.inventory.ComputerCartInventory;
@@ -71,7 +71,7 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
     private boolean firstupdate = true; //true if the update() function gets called the first time
     private boolean chDim = false;    //true if the cart changing the dimension (Portal, AE2 Storage,...)
     private boolean isRun = false; //true if the machine is turned on;
-    private ComputerCartController controller = new ComputerCartController(this); //The computer cart component
+    private CartController controller = new CartController(this); //The computer cart component
     private double startEnergy = -1; //Only used when placing the cart. Start energy stored in the item
     private int invsize = 0; //The current inventory size depending on the Inventory Upgrades
     private boolean onrail = false; // Store onRail from last tick to send a Signal

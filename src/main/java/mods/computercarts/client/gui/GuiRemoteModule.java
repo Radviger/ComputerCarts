@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RemoteModuleGui extends GuiContainer {
+public class GuiRemoteModule extends GuiContainer {
     private GuiTextField pass;
     private ResourceLocation texture = new ResourceLocation(ComputerCarts.MODID + ":textures/gui/remotemodulegui.png");
 
@@ -29,7 +29,7 @@ public class RemoteModuleGui extends GuiContainer {
     private boolean oPerm = false;
     private boolean locked = false;
 
-    public RemoteModuleGui() {
+    public GuiRemoteModule() {
         super(new RemoteModuleContainer());
 
         this.xSize = 150;

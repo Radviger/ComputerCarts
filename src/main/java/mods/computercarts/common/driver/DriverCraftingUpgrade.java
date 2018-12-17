@@ -6,7 +6,7 @@ import li.cil.oc.api.driver.EnvironmentProvider;
 import li.cil.oc.api.driver.item.HostAware;
 import li.cil.oc.api.network.EnvironmentHost;
 import li.cil.oc.api.network.ManagedEnvironment;
-import mods.computercarts.common.component.CraftingUpgradeCC;
+import mods.computercarts.common.component.CraftingUpgrade;
 import mods.computercarts.common.items.ModItems;
 import mods.computercarts.common.minecart.ComputerCart;
 import net.minecraft.item.ItemStack;
@@ -22,7 +22,7 @@ public class DriverCraftingUpgrade implements DriverItem, HostAware, Environment
     @Override
     public ManagedEnvironment createEnvironment(ItemStack stack, EnvironmentHost host) {
         if (ComputerCart.class.isAssignableFrom(host.getClass())) {
-            return new CraftingUpgradeCC((ComputerCart) host);
+            return new CraftingUpgrade((ComputerCart) host);
         }
         return null;
     }
@@ -50,7 +50,7 @@ public class DriverCraftingUpgrade implements DriverItem, HostAware, Environment
 
     @Override
     public Class<?> getEnvironment(ItemStack stack) {
-        return CraftingUpgradeCC.class;
+        return CraftingUpgrade.class;
     }
 
 }
