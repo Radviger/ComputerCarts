@@ -9,12 +9,12 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
 import org.lwjgl.opengl.GL11;
 
-public class ComputerCartModel extends ModelBase {
+public class ModelComputerCart extends ModelBase {
     ModelRenderer Shape1;
     ModelRenderer light;
     ModelRenderer Shape3;
 
-    public ComputerCartModel() {
+    public ModelComputerCart() {
         textureWidth = 256;
         textureHeight = 64;
 
@@ -56,11 +56,11 @@ public class ComputerCartModel extends ModelBase {
         GlStateManager.color(1, 1, 1);
     }
 
-    public void renderItem(float f) {
-        Shape1.render(f);
-        Shape3.render(f);
+    public void renderItem(float scale) {
+        Shape1.render(scale);
+        Shape3.render(scale);
         GlStateManager.color(0, 0, 0);
-        light.render(f);
+        light.render(scale);
         GlStateManager.color(1, 1, 1);
     }
 }

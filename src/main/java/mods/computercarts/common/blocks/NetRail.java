@@ -5,7 +5,7 @@ import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public interface INetRail {
+public interface NetRail {
     Environment getResponseEnvironment(World world, BlockPos pos);
 
     boolean isValid(World world, BlockPos pos, EntityMinecart cart);
