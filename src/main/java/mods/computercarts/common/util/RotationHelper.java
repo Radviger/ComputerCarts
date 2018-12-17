@@ -36,7 +36,7 @@ public class RotationHelper {
     public static EnumFacing directionFromYaw(double yaw) {
         yaw += 44.5;
         yaw = (yaw + 360) % 360;
-        int di = MathHelper.floor((yaw * 4.0D / 360D) + 0.5D);
+        int di = MathHelper.floor((yaw * 4 / 360D) + 0.5D);
         di = (di + 4) % 4;
         return RotationHelper.dir[di];
     }

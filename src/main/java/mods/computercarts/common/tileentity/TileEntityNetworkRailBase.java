@@ -65,7 +65,8 @@ public class TileEntityNetworkRailBase extends TileEntity implements IInventory,
         super.readFromNBT(compound);
         if (compound.hasKey("conMode")) Mode = compound.getInteger("conMode");
 
-        camoItem = new ItemStack((NBTTagCompound) compound.getTag("CamoItem"));
+        if (compound.hasKey("CamoItem"))
+            camoItem = new ItemStack((NBTTagCompound) compound.getTag("CamoItem"));
 
         if (FMLCommonHandler.instance().getEffectiveSide().isServer()) {
             if (compound.hasKey("Plug_1")) side.load((NBTTagCompound) compound.getTag("Plug_1"));

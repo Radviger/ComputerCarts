@@ -3,21 +3,25 @@
     "I": {
       "item": "minecraft:iron_ingot"
     },
-    "c": {
-      "item": "opencomputers:chamelium"
+    "C": {
+      "item": "opencomputers:material",
+      "data": 28
     },
     "S": {
-      "item": "opencomputers:lancard"
+      "item": "opencomputers:card",
+      "data": 6
     },
     "M": {
-      "item": "opencomputers:chip2"
+      "item": "opencomputers:material",
+      "data": 8
     },
     "K": {
       "item": "opencomputers:cable",
       "data": 0
     },
     "B": {
-      "item": "opencomputers:printedcircuitboard"
+      "item": "opencomputers:material",
+      "data": 4
     }
   },
   "pattern": [

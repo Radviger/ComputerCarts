@@ -49,7 +49,7 @@ public class RemoteModuleContainer extends Container {
     public boolean canInteractWith(EntityPlayer player) {
         if (IS_SERVER) {
             if (this.toBan.size() > 0 && this.toBan.contains(player)) return false;
-            return player.world == cart.world && player.getDistanceSq(cart.posX, cart.posY, cart.posZ) <= 64.0D && module.isEnabled();
+            return player.world == cart.world && player.getDistanceSq(cart.posX, cart.posY, cart.posZ) <= 64 && module.isEnabled();
         }
         return true;
     }

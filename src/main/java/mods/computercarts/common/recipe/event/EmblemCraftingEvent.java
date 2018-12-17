@@ -1,6 +1,6 @@
 package mods.computercarts.common.recipe.event;
 
-public abstract class EmblemCraftingEvent implements ICraftingToolHandler {
+public abstract class EmblemCraftingEvent implements CraftingToolHandler {
 
     /*@Override
     public boolean match(IInventory grid, ItemStack result) {

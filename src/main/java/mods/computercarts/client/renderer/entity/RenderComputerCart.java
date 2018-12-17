@@ -2,14 +2,14 @@ package mods.computercarts.client.renderer.entity;
 
 import mods.computercarts.ComputerCarts;
 import mods.computercarts.common.minecart.EntityComputerCart;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import org.lwjgl.opengl.GL11;
 
-public class ComputerCartRenderer extends Render<EntityComputerCart> {
+public class RenderComputerCart extends Render<EntityComputerCart> {
 
     /*private static final double EMBLEM_BX = 0.5001;
     private static final double EMBLEM_X = 0.5002;
@@ -17,15 +17,15 @@ public class ComputerCartRenderer extends Render<EntityComputerCart> {
 
     private static final ResourceLocation minecartTextures = new ResourceLocation(ComputerCarts.MODID + ":textures/entity/computercart.png");
     //private static final ResourceLocation emblemBackground = new ResourceLocation(ComputerCarts.MODID + ":textures/entity/computercart_eback.png");
-    protected ComputerCartModel modelMinecart = new ComputerCartModel();
+    protected ModelComputerCart modelMinecart = new ModelComputerCart();
 
-    public ComputerCartRenderer(RenderManager renderManager) {
+    public RenderComputerCart(RenderManager renderManager) {
         super(renderManager);
     }
 
     @Override
     public void doRender(EntityComputerCart cart, double x, double y, double z, float rotation, float partialTicks) {
-        GL11.glPushMatrix();
+        GlStateManager.pushMatrix();
         this.bindEntityTexture(cart);
 
         double cx = cart.lastTickPosX + (cart.posX - cart.lastTickPosX) * (double) partialTicks;
@@ -34,22 +34,22 @@ public class ComputerCartRenderer extends Render<EntityComputerCart> {
         double d6 = 0.30000001192092896D;
         double ryaw = (cart.rotationYaw + 360D) % 360;
 
-        double yaw = rotation;
+        float yaw = rotation;
         float pitch = cart.rotationPitch;
 
         Vec3d vec1 = cart.getPosOffset(cx, cy, cz, d6);
         Vec3d vec2 = cart.getPosOffset(cx, cy, cz, -d6);
 
         if (vec1 != null && vec2 != null) {
-            y += (vec1.y + vec2.y) / 2.0D - cy;
+            y += (vec1.y + vec2.y) / 2 - cy;
             Vec3d vec3 = vec2.addVector(-vec1.x, -vec1.y, -vec1.z);
             if (vec3.lengthVector() != 0) {
-                yaw = (float) (Math.atan2(vec3.z, vec3.x) * 180.0D / Math.PI);
-                pitch = (float) (Math.atan(vec3.y) * 73.0D);
+                yaw = (float) (Math.atan2(vec3.z, vec3.x) * 180 / Math.PI);
+                pitch = (float) (Math.atan(vec3.y) * 73);
             }
         }
 
-        yaw = (yaw + 360D) % 360D;
+        yaw = (yaw + 360F) % 360F;
         ryaw = yaw - ryaw;
         if (ryaw <= -90 || ryaw >= 90) {
             yaw += 180D;
@@ -57,24 +57,24 @@ public class ComputerCartRenderer extends Render<EntityComputerCart> {
         }
         yaw = 90F - yaw;
 
-        GL11.glTranslatef((float) x, (float) y, (float) z);
-        GL11.glRotated(yaw, 0.0D, 1.0D, 0.0D);
-        GL11.glRotatef(-pitch, 1.0F, 0.0F, 0.0F);
+        GlStateManager.translate((float) x, (float) y + 0.4, (float) z);
+        GlStateManager.rotate(yaw, 0, 1, 0);
+        GlStateManager.rotate(-pitch, 1, 0, 0);
         float rollamp = (float) cart.getRollingAmplitude() - partialTicks;
         float dmgamp = cart.getDamage() - partialTicks;
 
-        if (dmgamp < 0.0F)
-            dmgamp = 0.0F;
+        if (dmgamp < 0F)
+            dmgamp = 0F;
 
-        if (rollamp > 0.0F) {
-            GL11.glRotatef(MathHelper.sin(rollamp) * rollamp * dmgamp / 10.0F * (float) cart.getRollingDirection(), 0.0F, 0.0F, 1.0F);
+        if (rollamp > 0F) {
+            GlStateManager.rotate(MathHelper.sin(rollamp) * rollamp * dmgamp / 10F * (float) cart.getRollingDirection(), 0F, 0F, 1F);
         }
 
-        GL11.glColor3f(1, 1, 1);
-        GL11.glScalef(-1.0F, -1.0F, 1.0F);
+        GlStateManager.scale(-1F, -1F, 1F);
+
         this.modelMinecart.renderTile(cart, 0.0625F);
 
-        GL11.glRotated(90D, 0.0D, 1.0D, 0.0D);
+        GlStateManager.rotate(90F, 0, 1, 0);
 
         /*ResourceLocation emblem = (MOD_RAILCRAFT) ? cart.getEmblemIcon() : null;
 
@@ -115,7 +115,7 @@ public class ComputerCartRenderer extends Render<EntityComputerCart> {
             tes.draw();
         }*/
 
-        GL11.glPopMatrix();
+        GlStateManager.popMatrix();
     }
 
 

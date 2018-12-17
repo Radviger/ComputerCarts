@@ -2,6 +2,7 @@ package mods.computercarts.common;
 
 import mods.computercarts.Settings;
 import mods.computercarts.client.SlotIcons;
+import mods.computercarts.common.blocks.ModBlocks;
 import mods.computercarts.common.entityextend.RemoteExtenderRegister;
 import mods.computercarts.common.items.ModItems;
 import mods.computercarts.common.items.interfaces.ItemEntityInteract;
@@ -10,6 +11,7 @@ import mods.computercarts.network.ModNetwork;
 import mods.computercarts.network.message.ConfigSyncMessage;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -56,6 +58,8 @@ public class EventHandler {
         setCustomModelResourceLocation(ModItems.COMPUTER_CART_CASE, 2, new ModelResourceLocation(MODID + ":computer_cart_case3", "inventory"));
         setCustomModelResourceLocation(ModItems.COMPUTER_CART_CASE, 3, new ModelResourceLocation(MODID + ":computer_cart_case4", "inventory"));
         setCustomModelResourceLocation(ModItems.LINKING_UPGRADE, 0, new ModelResourceLocation(MODID + ":linking_upgrade", "inventory"));
+        setCustomModelResourceLocation(Item.getItemFromBlock(ModBlocks.NETWORK_RAIL), 0, new ModelResourceLocation(MODID + ":network_rail", "inventory"));
+        setCustomModelResourceLocation(Item.getItemFromBlock(ModBlocks.NETWORK_RAIL_BASE), 0, new ModelResourceLocation(MODID + ":network_rail_base", "inventory"));
     }
 
     @SubscribeEvent

@@ -26,6 +26,8 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.GlStateManager.DestFactor;
+import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -138,6 +140,7 @@ public class ComputerCartGui extends GuiContainer {
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+        this.drawDefaultBackground();
         GlStateManager.color(1F, 1F, 1F);
 
         Minecraft.getMinecraft().getTextureManager().bindTexture((container.getHasScreen()) ? textureScreen : textureNoScreen);
@@ -366,9 +369,9 @@ public class ComputerCartGui extends GuiContainer {
                     else if (slot.getHasStack() && (this.hoveredSlot instanceof ContainerSlot) && this.hoveredSlot.isItemValid(slot.getStack()))
                         highlight = true;
                 } else {
-                    /*if (this.hoveredNEI != null && (slot instanceof ContainerSlot) && slot.isItemValid(this.hoveredNEI)) {
+                    if (!this.hoveredJEI.isEmpty() && (slot instanceof ContainerSlot) && slot.isItemValid(this.hoveredJEI)) {
                         highlight = true;
-                    }*/
+                    }
                 }
             }
 
@@ -386,8 +389,8 @@ public class ComputerCartGui extends GuiContainer {
         IItemListOverlay overlay = runtime.getItemListOverlay();
         if (this.hoveredSlot != null && !isInPlayerInventory(this.hoveredSlot) && isSelectiveSlot(this.hoveredSlot)) {
             overlay.highlightStacks(overlay.getVisibleStacks().stream()
-                    .filter(this.hoveredSlot::isItemValid)
-                    .collect(Collectors.toList())
+                .filter(this.hoveredSlot::isItemValid)
+                .collect(Collectors.toList())
             );
             return;
         }
@@ -410,40 +413,39 @@ public class ComputerCartGui extends GuiContainer {
 
     //Draw Screen if there is one
     private void drawBufferLayer() {
-        GL11.glPushMatrix();
-        GL11.glTranslatef(bufferX, bufferY, 0);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(bufferX, bufferY, 0);
         Minecraft.getMinecraft().entityRenderer.disableLightmap();
         RenderHelper.disableStandardItemLighting();
-        GL11.glPushMatrix();
-        GL11.glTranslatef(-3, -3, 0);
-        GL11.glColor4f(1, 1, 1, 1);
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(-3, -3, 0);
+        GlStateManager.color(1, 1, 1, 1);
         BufferRenderer.drawBackground();
-        GL11.glPopMatrix();
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager.popMatrix();
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
         double scaleX = bufferRenderWidth / this.textbuffer.renderWidth();
         double scaleY = bufferRenderHeight / this.textbuffer.renderHeight();
         double scale = Math.min(scaleX, scaleY);
         if (scaleX > scale) {
-            GL11.glTranslated(this.textbuffer.renderWidth() * (scaleX - scale) / 2, 0, 0);
+            GlStateManager.translate(this.textbuffer.renderWidth() * (scaleX - scale) / 2, 0, 0);
         } else if (scaleY > scale) {
-            GL11.glTranslated(0, this.textbuffer.renderHeight() * (scaleY - scale) / 2, 0);
+            GlStateManager.translate(0, this.textbuffer.renderHeight() * (scaleY - scale) / 2, 0);
         }
-        GL11.glScaled(scale, scale, scale);
-        GL11.glScaled(this.bufferscale, this.bufferscale, 1);
+        GlStateManager.scale(scale, scale, scale);
+        GlStateManager.scale(this.bufferscale, this.bufferscale, 1);
         BufferRenderer.drawText(this.textbuffer);
         RenderHelper.enableStandardItemLighting();
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glPopMatrix();
+        GlStateManager.disableBlend();
+        GlStateManager.popMatrix();
     }
 
     //Render the Background Icons
     private void renderGuiSlots() {
-        Iterator<Slot> list = this.container.inventorySlots.iterator();
         this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glDisable(GL11.GL_LIGHTING);
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
+        GlStateManager.disableLighting();
 
         TextureAtlasSprite non = SlotIcons.fromTier(-1);
         if (non != null) {
@@ -451,8 +453,7 @@ public class ComputerCartGui extends GuiContainer {
         }
 
         //Render the Icons for Container Slots
-        while (list.hasNext()) {
-            Slot slot = list.next();
+        for (Slot slot : this.container.inventorySlots) {
             if (slot instanceof ContainerSlot) {
                 TextureAtlasSprite typeicon = SlotIcons.fromSlot(((ContainerSlot) slot).getSlotType());
                 if (typeicon != null)
@@ -476,8 +477,8 @@ public class ComputerCartGui extends GuiContainer {
     private void drawSelection() {
         int slot = this.container.selSlot - this.invslider.getScroll() * 4;
         if (slot >= 0 && slot < 16) {
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
             RenderHelper.disableStandardItemLighting();
             Minecraft.getMinecraft().renderEngine.bindTexture(selection);
             double now = System.currentTimeMillis() / 1000.0;
@@ -496,7 +497,7 @@ public class ComputerCartGui extends GuiContainer {
             b.pos(x + 20, y, zLevel).tex(1, offsetV).endVertex();
             t.draw();
             RenderHelper.enableStandardItemLighting();
-            GL11.glDisable(GL11.GL_BLEND);
+            GlStateManager.disableBlend();
         }
     }
 }

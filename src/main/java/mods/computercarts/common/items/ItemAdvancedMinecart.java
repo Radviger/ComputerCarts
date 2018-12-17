@@ -34,13 +34,13 @@ public class ItemAdvancedMinecart extends Item {
             double offset;
 
             if (BlockRailBase.isRailBlock(state)) {
-                offset = 0.0D;
+                offset = 0;
             } else {
                 if (state.getMaterial() != Material.AIR || !BlockRailBase.isRailBlock(world.getBlockState(pos.down()))) {
                     return this.behaviourDefaultDispenseItem.dispense(source, item);
                 }
 
-                offset = -1.0D;
+                offset = -1;
             }
 
             EntityMinecart cart = ((ItemAdvancedMinecart) item.getItem()).create(world, d0, d1 + offset, d2, item);

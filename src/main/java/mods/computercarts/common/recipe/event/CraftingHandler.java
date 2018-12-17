@@ -8,18 +8,18 @@ import java.util.Iterator;
 import java.util.List;
 
 public class CraftingHandler {
-    private static List<ICraftingToolHandler> handlers = new ArrayList<>();
+    private static List<CraftingToolHandler> handlers = new ArrayList<>();
 
-    public static void registerNewHandler(ICraftingToolHandler handler) {
+    public static void registerNewHandler(CraftingToolHandler handler) {
         if (handlers.contains(handler)) return;
         handlers.add(handler);
     }
 
     public static void onCraftingEvent(PlayerEvent.ItemCraftedEvent event) {
-        Iterator<ICraftingToolHandler> list = handlers.iterator();
+        Iterator<CraftingToolHandler> list = handlers.iterator();
         List<ItemStack> items = new ArrayList<>();
         while (list.hasNext()) {
-            ICraftingToolHandler handler = list.next();
+            CraftingToolHandler handler = list.next();
             if (handler.match(event.craftMatrix, event.crafting)) {
                 List<ItemStack> ls = handler.getItems(event.craftMatrix, event.crafting);
                 if (ls != null) items.addAll(ls);

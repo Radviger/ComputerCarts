@@ -4,22 +4,27 @@
       "item": "minecraft:iron_ingot"
     },
     "C": {
-      "item": "opencomputers:chip3"
+      "item": "opencomputers:material",
+      "data": 9
     },
     "R": {
       "item": "minecraft:redstone"
     },
     "G": {
-      "item": "opencomputers:generatorupgrade"
+      "item": "opencomputers:upgrade",
+      "data": 16
     },
     "W": {
-      "item": "opencomputers:wlancard2"
+      "item": "opencomputers:card",
+      "data": 7
     },
     "B": {
-      "item": "opencomputers:printedcircuitboard"
+      "item": "opencomputers:material",
+      "data": 4
     },
     "S": {
-      "item": "opencomputers:solargeneratorupgrade"
+      "item": "opencomputers:upgrade",
+      "data": 22
     }
   },
   "pattern": [

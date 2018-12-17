@@ -73,14 +73,14 @@ public class GuiUtil {
     }
 
     public static void drawGradientRect(int posX, int posY, int width, int height, int zLevel, int start, int end) {
-        float sa = (float) (start >> 24 & 255) / 255.0F;
-        float sr = (float) (start >> 16 & 255) / 255.0F;
-        float sg = (float) (start >> 8 & 255) / 255.0F;
-        float sb = (float) (start & 255) / 255.0F;
-        float ea = (float) (end >> 24 & 255) / 255.0F;
-        float er = (float) (end >> 16 & 255) / 255.0F;
-        float eg = (float) (end >> 8 & 255) / 255.0F;
-        float eb = (float) (end & 255) / 255.0F;
+        float sa = (float) (start >> 24 & 255) / 255F;
+        float sr = (float) (start >> 16 & 255) / 255F;
+        float sg = (float) (start >> 8 & 255) / 255F;
+        float sb = (float) (start & 255) / 255F;
+        float ea = (float) (end >> 24 & 255) / 255F;
+        float er = (float) (end >> 16 & 255) / 255F;
+        float eg = (float) (end >> 8 & 255) / 255F;
+        float eb = (float) (end & 255) / 255F;
 
         GlStateManager.disableTexture2D();
         GlStateManager.enableBlend();

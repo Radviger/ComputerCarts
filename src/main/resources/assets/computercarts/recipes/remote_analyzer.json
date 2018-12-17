@@ -1,13 +1,16 @@
 {
   "key": {
     "A": {
-      "item": "opencomputers:analyzer"
+      "item": "opencomputers:tool",
+      "data": 0
     },
     "C": {
-      "item": "opencomputers:chip2"
+      "item": "opencomputers:material",
+      "data": 8
     },
     "W": {
-      "item": "opencomputers:wlancard1"
+      "item": "opencomputers:upgrade",
+      "data": 31
     }
   },
   "pattern": [
@@ -17,7 +20,7 @@
   ],
   "result": {
     "count": 1,
-    "item": "computercarts:analyzer"
+    "item": "computercarts:remote_analyzer"
   },
   "type": "minecraft:crafting_shaped"
 }

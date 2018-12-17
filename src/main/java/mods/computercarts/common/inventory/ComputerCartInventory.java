@@ -90,11 +90,6 @@ public class ComputerCartInventory extends Inventory {
     }
 
     @Override
-    protected boolean ignoreNullStacks() {
-        return false;
-    }
-
-    @Override
     public String getName() {
         return cart.getName();
     }

@@ -24,13 +24,13 @@ public abstract class Inventory implements IInventory {
         if (slot >= 0 && slot < this.getMaxSizeInventory()) {
             if (number >= stacks.get(slot).getCount()) {
                 ItemStack get = stacks.get(slot);
-                stacks.remove(slot);
+                stacks.set(slot, ItemStack.EMPTY);
                 this.slotChanged(slot);
                 return get;
             } else {
                 ItemStack ret = stacks.get(slot).splitStack(number);
                 if (stacks.get(slot).isEmpty()) {
-                    stacks.remove(slot);
+                    stacks.set(slot, ItemStack.EMPTY);
                 }
                 this.slotChanged(slot);
                 return ret;
@@ -41,7 +41,6 @@ public abstract class Inventory implements IInventory {
 
     @Override
     public void setInventorySlotContents(int slot, @Nonnull ItemStack stack) {
-        if (!stack.isEmpty()) stack = null;
         if (slot < this.getMaxSizeInventory()) {
             stacks.set(slot, stack);
             this.slotChanged(slot);
@@ -50,7 +49,6 @@ public abstract class Inventory implements IInventory {
 
     //This is the same as setInventorySlotContents but will not send a Signal to the machine;
     private void updateSlotContents(int slot, @Nonnull ItemStack stack) {
-        if (!stack.isEmpty()) stack = null;
         if (slot < this.getMaxSizeInventory()) {
             stacks.set(slot, stack);
         }
@@ -63,7 +61,6 @@ public abstract class Inventory implements IInventory {
 
     @Override
     public void markDirty() {
-        if (this.ignoreNullStacks()) return;
         for (int i = 0; i < this.getSizeInventory(); i += 1) {
             ItemStack stack = this.getStackInSlot(i);
             if (!stack.isEmpty()) {
@@ -73,7 +70,7 @@ public abstract class Inventory implements IInventory {
     }
 
     @Override
-    public boolean isItemValidForSlot(int slot, ItemStack stack) {
+    public boolean isItemValidForSlot(int slot, @Nonnull ItemStack stack) {
         return true;
     }
 
@@ -106,7 +103,5 @@ public abstract class Inventory implements IInventory {
     protected abstract void slotChanged(int slot);
 
     abstract public int getMaxSizeInventory();
-
-    abstract protected boolean ignoreNullStacks();
 
 }

@@ -155,7 +155,7 @@ public class ComputerCartContainer extends Container {
         return res;
     }
 
-    private void transferToSlot(int slotindex, ItemStack stack) {
+    private void transferToSlot(int slotindex, @Nonnull ItemStack stack) {
         Slot slot = this.getSlot(slotindex);
         if (slot == null || !slot.isItemValid(stack) || stack.isEmpty()) return;
         if (slot.getHasStack() && !slot.getStack().isItemEqual(stack)) return;

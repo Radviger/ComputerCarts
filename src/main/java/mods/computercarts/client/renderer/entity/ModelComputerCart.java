@@ -7,7 +7,6 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
-import org.lwjgl.opengl.GL11;
 
 public class ModelComputerCart extends ModelBase {
     ModelRenderer Shape1;
@@ -47,7 +46,7 @@ public class ModelComputerCart extends ModelBase {
             GlStateManager.enableBlend();
             GlStateManager.color(rgb[0] & 0xFF, rgb[1] & 0xFF, rgb[2] & 0xFF);
         } else {
-            GL11.glColor3d(0, 0, 0);
+            GlStateManager.color(0, 0, 0);
         }
         light.render(f);
         GlStateManager.enableLighting();

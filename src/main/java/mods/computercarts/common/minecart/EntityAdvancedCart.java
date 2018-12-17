@@ -126,7 +126,7 @@ public abstract class EntityAdvancedCart extends EntityMinecart /*implements IEn
             item.setStackDisplayName(this.getCustomNameTag());
         }
 
-        this.entityDropItem(item, 0.0F);
+        this.entityDropItem(item, 0F);
     }
 
     @Override
@@ -168,7 +168,7 @@ public abstract class EntityAdvancedCart extends EntityMinecart /*implements IEn
     protected void applyDrag() {
         if (!(BitUtil.getBit(this.dataManager.get(FLAGS), 0) || BitUtil.getBit(this.dataManager.get(FLAGS), 1))) {
             this.motionX *= 0.9699999785423279D;
-            this.motionY *= 0.0D;
+            this.motionY *= 0;
             this.motionZ *= 0.9699999785423279D;
 
             if (this.dataManager.get(ENGINE_SPEED) != 0) {

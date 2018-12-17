@@ -53,13 +53,13 @@ public abstract class ComponentInventory implements IInventory, Environment {
         if (slot >= 0 && slot < this.getSizeInventory()) {
             if (number >= slots.get(slot).getCount()) {
                 ItemStack get = slots.get(slot);
-                slots.remove(slot);
+                slots.set(slot, ItemStack.EMPTY);
                 this.onItemRemoved(slot, get);
                 return get;
             } else {
                 ItemStack ret = slots.get(slot).splitStack(number);
                 if (slots.get(slot).isEmpty()) {
-                    slots.remove(slot);
+                    slots.set(slot, ItemStack.EMPTY);
                     this.onItemRemoved(slot, ret);
                 }
                 return ret;

@@ -14,7 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class NetworkRail extends BlockRailBase implements INetRail {
+public class NetworkRail extends BlockRailBase implements NetRail {
     public static final PropertyEnum<EnumRailDirection> SHAPE = PropertyEnum.create("shape", EnumRailDirection.class, dir -> dir != EnumRailDirection.NORTH_EAST && dir != EnumRailDirection.NORTH_WEST && dir != EnumRailDirection.SOUTH_EAST && dir != EnumRailDirection.SOUTH_WEST);
 
     protected NetworkRail() {

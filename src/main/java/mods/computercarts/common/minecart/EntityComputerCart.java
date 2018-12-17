@@ -18,7 +18,7 @@ import li.cil.oc.server.agent.Player;
 import mods.computercarts.ComputerCarts;
 import mods.computercarts.Settings;
 import mods.computercarts.common.SyncEntity;
-import mods.computercarts.common.blocks.INetRail;
+import mods.computercarts.common.blocks.NetRail;
 import mods.computercarts.common.component.ComputerCartController;
 import mods.computercarts.common.driver.CustomDriver;
 import mods.computercarts.common.inventory.ComponentInventory;
@@ -409,8 +409,8 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
     private void checkRailConnection() {
         //If the cart isn't connected check for a new connection
         BlockPos pos = new BlockPos(MathHelper.floor(this.posX), MathHelper.floor(this.posY), MathHelper.floor(this.posZ));
-        if (!this.cRailCon && this.onRail() && (this.world.getBlockState(pos).getBlock() instanceof INetRail)) {
-            INetRail netrail = (INetRail) this.world.getBlockState(pos).getBlock();
+        if (!this.cRailCon && this.onRail() && (this.world.getBlockState(pos).getBlock() instanceof NetRail)) {
+            NetRail netrail = (NetRail) this.world.getBlockState(pos).getBlock();
             if (netrail.isValid(this.world, pos, this) && netrail.getResponseEnvironment(this.world, pos) != null) {
                 this.cRail = pos;
                 this.cRailDim = this.world.provider.getDimension();
@@ -420,8 +420,8 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
         //If the cart is connected to a rail check if the connection is still valid and connect or disconnect
         if (this.cRailCon) {
             World w = DimensionManager.getWorld(this.cRailDim);
-            if (w.getBlockState(this.cRail).getBlock() instanceof INetRail) {
-                INetRail netrail = (INetRail) w.getBlockState(this.cRail).getBlock();
+            if (w.getBlockState(this.cRail).getBlock() instanceof NetRail) {
+                NetRail netrail = (NetRail) w.getBlockState(this.cRail).getBlock();
                 //Connect a new network Rail
                 if (netrail.isValid(w, this.cRail, this) && netrail.getResponseEnvironment(w, this.cRail) != null) {
                     Node railnode = netrail.getResponseEnvironment(w, this.cRail).node();

@@ -55,6 +55,7 @@ public class RemoteModuleGui extends GuiContainer {
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+        this.drawDefaultBackground();
         GlStateManager.color(1F, 1F, 1F);
 
         Minecraft.getMinecraft().getTextureManager().bindTexture(texture);

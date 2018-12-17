@@ -12,7 +12,7 @@ import java.util.Map;
 
 import static mods.computercarts.common.recipe.Recipes.SLOT_ROM;
 
-public class ComputerCartRomCrafting implements ICraftingToolHandler {
+public class ComputerCartRomCrafting implements CraftingToolHandler {
 
     @Override
     public boolean match(IInventory grid, ItemStack result) {
