@@ -7,7 +7,7 @@ import li.cil.oc.api.network.EnvironmentHost;
 import li.cil.oc.api.network.ManagedEnvironment;
 import mods.computercarts.common.component.LinkingUpgrade;
 import mods.computercarts.common.items.ItemLinkingUpgrade;
-import mods.computercarts.common.minecart.IComputerCart;
+import mods.computercarts.common.minecart.ComputerCart;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -16,7 +16,7 @@ public class DriverLinkingUpgrade implements DriverItem, HostAware {
 
     @Override
     public boolean worksWith(ItemStack stack, Class<? extends EnvironmentHost> host) {
-        return IComputerCart.class.isAssignableFrom(host) && EntityMinecart.class.isAssignableFrom(host) && worksWith(stack);
+        return ComputerCart.class.isAssignableFrom(host) && EntityMinecart.class.isAssignableFrom(host) && worksWith(stack);
     }
 
     @Override
@@ -27,7 +27,7 @@ public class DriverLinkingUpgrade implements DriverItem, HostAware {
     @Override
     public ManagedEnvironment createEnvironment(ItemStack stack, EnvironmentHost host) {
         if (!worksWith(stack, host.getClass())) return null;
-        return new LinkingUpgrade((IComputerCart) host);
+        return new LinkingUpgrade((ComputerCart) host);
     }
 
     @Override

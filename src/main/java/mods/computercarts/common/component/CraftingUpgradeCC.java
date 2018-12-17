@@ -6,7 +6,7 @@ import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.Visibility;
 import li.cil.oc.api.prefab.AbstractManagedEnvironment;
-import mods.computercarts.common.minecart.IComputerCart;
+import mods.computercarts.common.minecart.ComputerCart;
 import mods.computercarts.common.util.InventoryUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -28,10 +28,10 @@ import java.util.List;
  */
 public class CraftingUpgradeCC extends AbstractManagedEnvironment {
 
-    private IComputerCart cart;
+    private ComputerCart cart;
     private CraftingInventory cinv;
 
-    public CraftingUpgradeCC(IComputerCart cart) {
+    public CraftingUpgradeCC(ComputerCart cart) {
         super();
         this.cart = cart;
         this.cinv = new CraftingInventory();

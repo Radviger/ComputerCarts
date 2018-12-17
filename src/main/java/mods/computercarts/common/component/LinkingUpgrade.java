@@ -3,13 +3,13 @@ package mods.computercarts.common.component;
 import li.cil.oc.api.Network;
 import li.cil.oc.api.network.Visibility;
 import li.cil.oc.api.prefab.AbstractManagedEnvironment;
-import mods.computercarts.common.minecart.IComputerCart;
+import mods.computercarts.common.minecart.ComputerCart;
 
 public class LinkingUpgrade extends AbstractManagedEnvironment {
 
-    private IComputerCart cart;
+    private ComputerCart cart;
 
-    public LinkingUpgrade(IComputerCart cart) {
+    public LinkingUpgrade(ComputerCart cart) {
         super();
         this.cart = cart;
         this.setNode(Network.newNode(this, Visibility.Network).withComponent("cartlinking").create());

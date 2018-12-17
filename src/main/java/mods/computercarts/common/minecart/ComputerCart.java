@@ -7,7 +7,7 @@ import li.cil.oc.api.network.EnvironmentHost;
 import net.minecraft.inventory.IInventory;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
-public interface IComputerCart extends EnvironmentHost, Environment, Agent, Tiered, IInventory, IFluidHandler {
+public interface ComputerCart extends EnvironmentHost, Environment, Agent, Tiered, IInventory {
 
     //Get Number of Components
     int componentCount();

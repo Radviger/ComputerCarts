@@ -23,7 +23,6 @@ import mods.computercarts.common.component.ComputerCartController;
 import mods.computercarts.common.driver.CustomDriver;
 import mods.computercarts.common.inventory.ComponentInventory;
 import mods.computercarts.common.inventory.ComputerCartInventory;
-import mods.computercarts.common.items.ItemComputerCart;
 import mods.computercarts.common.items.ModItems;
 import mods.computercarts.common.util.ComputerCartData;
 import mods.computercarts.common.util.ItemUtil;
@@ -36,6 +35,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -52,9 +52,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
-import net.minecraftforge.fluids.capability.IFluidTankProperties;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import javax.annotation.Nonnull;
@@ -63,7 +61,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class EntityComputerCart extends EntityAdvancedCart implements MachineHost, Analyzable, SyncEntity, IComputerCart {
+public class EntityComputerCart extends EntityAdvancedCart implements MachineHost, Analyzable, SyncEntity, ComputerCart {
     protected static final DataParameter<Integer> LIGHT_COLOR = EntityDataManager.createKey(EntityComputerCart.class, DataSerializers.VARINT);
 
     private final boolean isServer = FMLCommonHandler.instance().getEffectiveSide().isServer();
@@ -148,6 +146,7 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
         }
     };
 
+    public InventoryBasic eqinv = new InventoryBasic("equipment", false, 0);
     public ComputerCartInventory maininv = new ComputerCartInventory(this);
 
     public MultiTank tanks = new MultiTank() {
@@ -386,7 +385,7 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
 
     @Override
     public boolean processInitialInteract(EntityPlayer p, EnumHand hand) {
-        ItemStack refMan = API.items.get("manual").createItemStack(1);
+        ItemStack refMan = ModItems.getOCItem("manual");
         boolean openwiki = !p.getHeldItem(hand).isEmpty() && p.isSneaking() && p.getHeldItem(hand).getItem() == refMan.getItem() && p.getHeldItem(hand).getItemDamage() == refMan.getItemDamage();
 
         //if (Loader.isModLoaded("Railcraft") && RailcraftUtils.isUsingChrowbar(p)) return true;
@@ -506,8 +505,9 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
     }
 
     @Override
+    @Nonnull
     public ItemStack getPickedResult(RayTraceResult target) {
-        return null;
+        return ItemStack.EMPTY;
     }
 
     /*----------------------------------*/
@@ -534,8 +534,7 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
     }
 
     @Override
-    public void markChanged() {
-    }
+    public void markChanged() {}
 
     @Override
     public Machine machine() {
@@ -544,9 +543,9 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
 
     @Override
     public Iterable<ItemStack> internalComponents() {
-        ArrayList<ItemStack> components = new ArrayList<>();
+        List<ItemStack> components = new ArrayList<>();
         for (int i = 0; i < compinv.getSizeInventory(); i += 1) {
-            if (compinv.getStackInSlot(i) != null && this.compinv.isComponentSlot(i, compinv.getStackInSlot(i)))
+            if (!compinv.getStackInSlot(i).isEmpty() && this.compinv.isComponentSlot(i, compinv.getStackInSlot(i)))
                 components.add(compinv.getStackInSlot(i));
         }
         return components;
@@ -562,16 +561,14 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
     }
 
     @Override
-    public void onMachineConnect(Node node) {
-    }
+    public void onMachineConnect(Node node) {}
 
     @Override
-    public void onMachineDisconnect(Node node) {
-    }
+    public void onMachineDisconnect(Node node) {}
 
     @Override
     public IInventory equipmentInventory() {
-        return null;
+        return this.eqinv;
     }
 
     @Override
@@ -773,28 +770,6 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
                 if (c == index) return (IFluidTank) this.compinv.getSlotComponent(i);
             }
         }
-        return null;
-    }
-
-    @Override
-    public IFluidTankProperties[] getTankProperties() {
-        return new IFluidTankProperties[0];
-    }
-
-    @Override
-    public int fill(FluidStack fluidStack, boolean b) {
-        return 0;
-    }
-
-    @Nullable
-    @Override
-    public FluidStack drain(FluidStack fluidStack, boolean b) {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public FluidStack drain(int i, boolean b) {
         return null;
     }
     /*--------------------*/

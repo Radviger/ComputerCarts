@@ -10,7 +10,7 @@ import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.server.component.UpgradeInventoryController;
 import mods.computercarts.common.items.ModItems;
 import mods.computercarts.common.minecart.EntityComputerCart;
-import mods.computercarts.common.minecart.IComputerCart;
+import mods.computercarts.common.minecart.ComputerCart;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -18,7 +18,7 @@ public class DriverInventoryController implements DriverItem, HostAware, Environ
 
     @Override
     public boolean worksWith(ItemStack stack, Class<? extends EnvironmentHost> host) {
-        if (IComputerCart.class.isAssignableFrom(host)) return this.worksWith(stack);
+        if (ComputerCart.class.isAssignableFrom(host)) return this.worksWith(stack);
         return false;
     }
 
