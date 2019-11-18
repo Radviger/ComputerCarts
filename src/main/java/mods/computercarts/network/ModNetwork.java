@@ -2,10 +2,13 @@ package mods.computercarts.network;
 
 import mods.computercarts.ComputerCarts;
 import mods.computercarts.network.message.*;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -21,13 +24,18 @@ public class ModNetwork {
         CHANNEL = NetworkRegistry.INSTANCE.newSimpleChannel(ComputerCarts.MODID.toLowerCase());
         int id = -1;
 
-        CHANNEL.registerMessage(GuiButtonClick.Handler.class, GuiButtonClick.class, id++, Side.SERVER);
-        CHANNEL.registerMessage(ComputercartInventoryUpdate.Handler.class, ComputercartInventoryUpdate.class, id++, Side.CLIENT);
-        CHANNEL.registerMessage(EntitySyncRequest.Handler.class, EntitySyncRequest.class, id++, Side.SERVER);
-        CHANNEL.registerMessage(EntitySyncData.Handler.class, EntitySyncData.class, id++, Side.CLIENT);
-        CHANNEL.registerMessage(UpdateRunning.Handler.class, UpdateRunning.class, id++, Side.CLIENT);
-        CHANNEL.registerMessage(ItemUseMessage.Handler.class, ItemUseMessage.class, id++, Side.CLIENT);
-        CHANNEL.registerMessage(ConfigSyncMessage.Handler.class, ConfigSyncMessage.class, id++, Side.CLIENT);
+        CHANNEL.registerMessage(MessageRemoteModuleSetup.Handler.class, MessageRemoteModuleSetup.class, id++, Side.SERVER);
+        CHANNEL.registerMessage(MessagePowerButton.Handler.class, MessagePowerButton.class, id++, Side.SERVER);
+        CHANNEL.registerMessage(MessageNetworkMode.Handler.class, MessageNetworkMode.class, id++, Side.SERVER);
+        CHANNEL.registerMessage(MessageEntitySyncRequest.Handler.class, MessageEntitySyncRequest.class, id++, Side.SERVER);
+        CHANNEL.registerMessage(MessageEntitySyncResponse.Handler.class, MessageEntitySyncResponse.class, id++, Side.CLIENT);
+        CHANNEL.registerMessage(MessageCopyToClipboard.Handler.class, MessageCopyToClipboard.class, id++, Side.CLIENT);
+        CHANNEL.registerMessage(MessageConfigSync.Handler.class, MessageConfigSync.class, id++, Side.CLIENT);
+    }
+
+    public static void sendColoredMessage(EntityPlayer target, TextFormatting color, ITextComponent message) {
+        message.getStyle().setColor(color);
+        target.sendMessage(message);
     }
 
     public static void sendToNearPlayers(IMessage msg, TileEntity entity) {

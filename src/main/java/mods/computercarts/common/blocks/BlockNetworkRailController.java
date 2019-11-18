@@ -1,13 +1,14 @@
 package mods.computercarts.common.blocks;
 
 import mods.computercarts.ComputerCarts;
-import mods.computercarts.common.tileentity.TileEntityNetworkRailBase;
+import mods.computercarts.common.tileentity.TileEntityNetworkRailController;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
@@ -16,14 +17,19 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class BlockNetworkRailBase extends BlockContainer {
+public class BlockNetworkRailController extends BlockContainer {
 
-    protected BlockNetworkRailBase() {
+    protected BlockNetworkRailController() {
         super(Material.IRON);
-        this.setUnlocalizedName(ComputerCarts.MODID + ".network_rail_base");
-        this.setRegistryName("network_rail_base");
+        this.setUnlocalizedName(ComputerCarts.MODID + ".network_rail_controller");
+        this.setRegistryName("network_rail_controller");
         this.setHardness(2F);
         this.setResistance(5f);
+    }
+
+    @Override
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        return EnumBlockRenderType.MODEL;
     }
 
     @Override
@@ -35,7 +41,7 @@ public class BlockNetworkRailBase extends BlockContainer {
     }
 
     @Override
-    public boolean canBeReplacedByLeaves(IBlockState state, IBlockAccess blockaccessor, BlockPos pos) {
+    public boolean canBeReplacedByLeaves(IBlockState state, IBlockAccess blockAccessor, BlockPos pos) {
         return false;
     }
 
@@ -52,11 +58,11 @@ public class BlockNetworkRailBase extends BlockContainer {
     @Nullable
     @Override
     public TileEntity createTileEntity(World world, IBlockState state) {
-        return new TileEntityNetworkRailBase();
+        return new TileEntityNetworkRailController();
     }
 
     @Override
     public TileEntity createNewTileEntity(World world, int meta) {
-        return new TileEntityNetworkRailBase();
+        return new TileEntityNetworkRailController();
     }
 }

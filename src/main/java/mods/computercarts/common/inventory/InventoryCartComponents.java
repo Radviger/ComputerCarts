@@ -30,16 +30,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public abstract class ComponentInventory implements IInventory, Environment {
+public abstract class InventoryCartComponents implements IInventory, Environment {
 
     protected MachineHost host;
-    private final NonNullList<ItemStack> slots = NonNullList.withSize(this.getSizeInventory(), ItemStack.EMPTY);
+    private final NonNullList<ItemStack> slots;
+    private final ManagedEnvironment[] components;
 
     private List<ManagedEnvironment> updatingComponents = new ArrayList<>();
-    private ManagedEnvironment[] components = new ManagedEnvironment[this.getSizeInventory()];
 
-    public ComponentInventory(MachineHost host) {
+    public InventoryCartComponents(MachineHost host, int size) {
         this.host = host;
+        this.slots = NonNullList.withSize(size, ItemStack.EMPTY);
+        this.components = new ManagedEnvironment[size];
+    }
+
+    @Override
+    public int getSizeInventory() {
+        return this.slots.size();
     }
 
     @Override

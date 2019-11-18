@@ -1,0 +1,9 @@
+{
+  "parent": "block/cube_bottom_top",
+  "textures": {
+    "particle":"computercarts:blocks/network_rail_controller_top",
+    "top":"computercarts:blocks/network_rail_controller_top",
+    "down":"computercarts:blocks/network_rail_controller",
+    "side":"computercarts:blocks/network_rail_controller"
+  }
+}

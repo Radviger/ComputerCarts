@@ -282,8 +282,8 @@ public abstract class RemoteCartExtender implements WirelessEndpoint {
         return res;
     }
 
-    public NBTTagCompound saveNBTData(NBTTagCompound nbt) {
-        nbt.setBoolean(ComputerCarts.MODID + ":rc_enabled", enabled);
+    public NBTTagCompound saveNBTData(NBTTagCompound output) {
+        output.setBoolean(ComputerCarts.MODID + ":rc_enabled", enabled);
         if (enabled) {
             NBTTagCompound rc = new NBTTagCompound();
             if (this.address != null) rc.setString("rc_address", this.address);
@@ -302,23 +302,23 @@ public abstract class RemoteCartExtender implements WirelessEndpoint {
                 rc.setTag("rc_dropitem", dropnbt);
             }
             this.writeModuleNBT(rc);
-            nbt.setTag(ComputerCarts.MODID + ":rc_settings", rc);
+            output.setTag(ComputerCarts.MODID + ":rc_settings", rc);
         }
-        return nbt;
+        return output;
     }
 
-    public void loadNBTData(NBTTagCompound compound) {
+    public void loadNBTData(NBTTagCompound input) {
         //boolean hasEntity = world.loadedEntityList.contains(this.entity);
         //if(!hasEntity && this.world != entity.world) return;
 
 
-        if (compound.hasKey(ComputerCarts.MODID + ":rc_enabled"))
-            enabled = compound.getBoolean(ComputerCarts.MODID + ":rc_enabled");
+        if (input.hasKey(ComputerCarts.MODID + ":rc_enabled"))
+            enabled = input.getBoolean(ComputerCarts.MODID + ":rc_enabled");
         else
             enabled = false;
 
-        if (compound.hasKey(ComputerCarts.MODID + ":rc_settings") && this.enabled) {
-            NBTTagCompound rc = compound.getCompoundTag(ComputerCarts.MODID + ":rc_settings");
+        if (input.hasKey(ComputerCarts.MODID + ":rc_settings") && this.enabled) {
+            NBTTagCompound rc = input.getCompoundTag(ComputerCarts.MODID + ":rc_settings");
             if (rc.hasKey("rc_address")) this.address = rc.getString("rc_address");
             else if (rc.hasKey("rc_uuid")) this.address = rc.getString("rc_uuid");
 
@@ -482,8 +482,8 @@ public abstract class RemoteCartExtender implements WirelessEndpoint {
         }
 
         @Override
-        public void deserializeNBT(NBTTagCompound compound) {
-            getStorage().readNBT(CAPABILITY, this.extender, null, compound);
+        public void deserializeNBT(NBTTagCompound input) {
+            getStorage().readNBT(CAPABILITY, this.extender, null, input);
         }
 
         public Storage getStorage() {

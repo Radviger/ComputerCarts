@@ -32,7 +32,7 @@ public class ManualPathProvider implements PathProvider {
     public String pathFor(World world, BlockPos pos) {
         Block block = world.getBlockState(pos).getBlock();
 
-        if (block == ModBlocks.NETWORK_RAIL_BASE) return PATH_PREFIX + "block/netrailbase.md";
+        if (block == ModBlocks.NETWORK_RAIL_CONTROLLER) return PATH_PREFIX + "block/netrailbase.md";
         else if (block == ModBlocks.NETWORK_RAIL) return PATH_PREFIX + "block/netrail.md";
 
         return null;

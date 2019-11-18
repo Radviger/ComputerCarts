@@ -8,7 +8,7 @@ import mods.computercarts.common.items.ModItems;
 import mods.computercarts.common.items.interfaces.ItemEntityInteract;
 import mods.computercarts.common.recipe.event.CraftingHandler;
 import mods.computercarts.network.ModNetwork;
-import mods.computercarts.network.message.ConfigSyncMessage;
+import mods.computercarts.network.message.MessageConfigSync;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
@@ -59,7 +59,7 @@ public class EventHandler {
         setCustomModelResourceLocation(ModItems.COMPUTER_CART_CASE, 3, new ModelResourceLocation(MODID + ":computer_cart_case4", "inventory"));
         setCustomModelResourceLocation(ModItems.LINKING_UPGRADE, 0, new ModelResourceLocation(MODID + ":linking_upgrade", "inventory"));
         setCustomModelResourceLocation(Item.getItemFromBlock(ModBlocks.NETWORK_RAIL), 0, new ModelResourceLocation(MODID + ":network_rail", "inventory"));
-        setCustomModelResourceLocation(Item.getItemFromBlock(ModBlocks.NETWORK_RAIL_BASE), 0, new ModelResourceLocation(MODID + ":network_rail_base", "inventory"));
+        setCustomModelResourceLocation(Item.getItemFromBlock(ModBlocks.NETWORK_RAIL_CONTROLLER), 0, new ModelResourceLocation(MODID + ":network_rail_controller", "inventory"));
     }
 
     @SubscribeEvent
@@ -99,7 +99,7 @@ public class EventHandler {
     public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
         NBTTagCompound config = new NBTTagCompound();
         config.setIntArray("remoterange", Settings.RemoteRange);
-        ModNetwork.CHANNEL.sendTo(new ConfigSyncMessage(config), (EntityPlayerMP) event.player);
+        ModNetwork.CHANNEL.sendTo(new MessageConfigSync(config), (EntityPlayerMP) event.player);
     }
 
     @SubscribeEvent

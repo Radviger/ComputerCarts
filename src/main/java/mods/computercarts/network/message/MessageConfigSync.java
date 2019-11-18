@@ -8,14 +8,14 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class ConfigSyncMessage implements IMessage {
+public class MessageConfigSync implements IMessage {
 
     public NBTTagCompound config = null;
 
-    public ConfigSyncMessage() {
+    public MessageConfigSync() {
     }
 
-    public ConfigSyncMessage(NBTTagCompound nbt) {
+    public MessageConfigSync(NBTTagCompound nbt) {
         config = (nbt == null) ? new NBTTagCompound() : nbt;
     }
 
@@ -29,10 +29,10 @@ public class ConfigSyncMessage implements IMessage {
         ByteBufUtils.writeTag(buf, config);
     }
 
-    public static class Handler implements IMessageHandler<ConfigSyncMessage, IMessage> {
+    public static class Handler implements IMessageHandler<MessageConfigSync, IMessage> {
 
         @Override
-        public IMessage onMessage(ConfigSyncMessage msg, MessageContext ctx) {
+        public IMessage onMessage(MessageConfigSync msg, MessageContext ctx) {
             ItemCartRemoteModule.range = msg.config.getIntArray("remoterange");
             return null;
         }

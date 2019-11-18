@@ -38,7 +38,7 @@ public class ModelComputerCart extends ModelBase {
     public void renderTile(Entity entity, float f) {
         Shape1.render(f);
         Shape3.render(f);
-        if (((EntityComputerCart) entity).getRunning()) {
+        if (((EntityComputerCart) entity).isRunning()) {
             EntityComputerCart cart = (EntityComputerCart) entity;
             byte[] rgb = ColorUtil.colorToRGB(cart.getLightColor());
             GlStateManager.disableLighting();

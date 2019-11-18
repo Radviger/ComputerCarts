@@ -31,7 +31,7 @@
   ],
   "result": {
     "count": 1,
-    "item": "computercarts:network_rail_base"
+    "item": "computercarts:network_rail_controller"
   },
   "type": "minecraft:crafting_shaped"
 }

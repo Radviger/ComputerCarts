@@ -2,15 +2,15 @@ package mods.computercarts.client.gui;
 
 import mods.computercarts.ComputerCarts;
 import mods.computercarts.client.gui.widget.GuiUtil;
-import mods.computercarts.common.container.RemoteModuleContainer;
+import mods.computercarts.common.container.ContainerRemoteModule;
 import mods.computercarts.network.ModNetwork;
-import mods.computercarts.network.message.GuiButtonClick;
+import mods.computercarts.network.message.MessageRemoteModuleSetup;
+import mods.computercarts.network.message.MessageRemoteModuleSetup.Action;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
@@ -23,14 +23,14 @@ import java.util.List;
 
 public class GuiRemoteModule extends GuiContainer {
     private GuiTextField pass;
-    private ResourceLocation texture = new ResourceLocation(ComputerCarts.MODID + ":textures/gui/remotemodulegui.png");
+    private ResourceLocation texture = new ResourceLocation(ComputerCarts.MODID + ":textures/gui/remote_module.png");
 
     private int passMsgR = 100;
     private boolean oPerm = false;
     private boolean locked = false;
 
     public GuiRemoteModule() {
-        super(new RemoteModuleContainer());
+        super(new ContainerRemoteModule());
 
         this.xSize = 150;
         this.ySize = 117;
@@ -113,22 +113,20 @@ public class GuiRemoteModule extends GuiContainer {
     public void actionPerformed(GuiButton button) {
         switch (button.id) {
             case 0:
-                NBTTagCompound nbt = new NBTTagCompound();
-                nbt.setString("password", pass.getText());
-                ModNetwork.CHANNEL.sendToServer(new GuiButtonClick(2, 0, nbt));
+                ModNetwork.CHANNEL.sendToServer(new MessageRemoteModuleSetup(Action.SET_PASSWORD, pass.getText()));
                 this.pass.setText("");
                 break;
             case 1:
-                ModNetwork.CHANNEL.sendToServer(new GuiButtonClick(2, 1, null));
+                ModNetwork.CHANNEL.sendToServer(new MessageRemoteModuleSetup(Action.LOCK, null));
                 break;
             case 2:
-                ModNetwork.CHANNEL.sendToServer(new GuiButtonClick(2, 2, null));
+                ModNetwork.CHANNEL.sendToServer(new MessageRemoteModuleSetup(Action.DISABLE, null));
                 break;
         }
     }
 
-    private RemoteModuleContainer getContainer() {
-        return (RemoteModuleContainer) this.inventorySlots;
+    private ContainerRemoteModule getContainer() {
+        return (ContainerRemoteModule) this.inventorySlots;
     }
 
     @Override

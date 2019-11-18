@@ -2,7 +2,7 @@ package mods.computercarts.common.blocks;
 
 import li.cil.oc.api.network.Environment;
 import mods.computercarts.ComputerCarts;
-import mods.computercarts.common.tileentity.TileEntityNetworkRailBase;
+import mods.computercarts.common.tileentity.TileEntityNetworkRailController;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
@@ -52,8 +52,8 @@ public class BlockNetworkRail extends BlockRailBase implements NetRail {
     @Override
     public Environment getResponseEnvironment(World world, BlockPos pos) {
         TileEntity entity = world.getTileEntity(pos.down());
-        if (entity instanceof TileEntityNetworkRailBase)
-            return ((TileEntityNetworkRailBase) entity).getRailPlug();
+        if (entity instanceof TileEntityNetworkRailController)
+            return ((TileEntityNetworkRailController) entity).getRailPlug();
         return null;
     }
 

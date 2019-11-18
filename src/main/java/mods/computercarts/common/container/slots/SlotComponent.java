@@ -15,18 +15,18 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-public class ContainerSlot extends Slot {
+public class SlotComponent extends Slot {
 
     private int tier;
     private String type;
 
-    public ContainerSlot(IInventory inventory, int index, int xpos, int ypos, int tier, String type) {
+    public SlotComponent(IInventory inventory, int index, int xpos, int ypos, int tier, String type) {
         super(inventory, index, xpos, ypos);
         this.tier = tier;
         this.type = type;
     }
 
-    public ContainerSlot(IInventory inventory, int index, int xpos, int ypos, ItemStack container) {
+    public SlotComponent(IInventory inventory, int index, int xpos, int ypos, ItemStack container) {
         super(inventory, index, xpos, ypos);
 
         DriverItem driver = Driver.driverFor(container);

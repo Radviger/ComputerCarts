@@ -1,6 +1,6 @@
 ## Network Rail Controller
 
-![A Block](block:computercarts:network_rail_base@5)
+![A Block](block:computercarts:network_rail_controller@5)
 
 Works on all sides like a normal [network cable](/%LANGUAGE%/block/cable.md), but not on the top side.
 On the top side no cables can connect, but [Networkrails](netrail.md) can.

@@ -38,7 +38,8 @@ public class ItemComputerCart extends ItemAdvancedMinecart implements ComponentI
 
     @Override
     public EntityMinecart create(World world, double x, double y, double z, ItemStack stack) {
-        return EntityComputerCart.create(world, x, y, z, ItemUtil.getCartData(stack));
+        ComputerCartData data = ItemUtil.getCartData(stack);
+        return data != null ? new EntityComputerCart(world, x, y, z, data) : null;
     }
 
     @Override

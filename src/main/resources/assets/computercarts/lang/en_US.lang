@@ -9,23 +9,29 @@ item.computercarts.linking_upgrade.name=Minecart Linking Upgrade
 
 #Block Names
 tile.computercarts.network_rail.name=Network Rail
-tile.computercarts.network_rail_base.name=Network Rail Controller
+tile.computercarts.network_rail_controller.name=Network Rail Controller
 
 #Entity Names
 entity.computercarts.computer_cart.name=Computer Cart
 
 #GUI Text (Head)
-gui.computercarts.network_rail_base.title=Network Rail Controller
-gui.computercarts.manual=OC-Minecarts
+gui.computercarts.network_rail_controller.title=Network Rail Controller
+gui.computercarts.network_rail_controller.mode.network_power=Messages + Power
+gui.computercarts.network_rail_controller.mode.network=Messages
+gui.computercarts.network_rail_controller.mode.power=Power
+gui.computercarts.network_rail_controller.mode.none=None
+gui.computercarts.manual=ComputerCarts
 gui.computercarts.remmconf=Remote Module Config
 
 #GUI Text
-gui.computercarts.network_rail_base.info=Connection Type
+gui.computercarts.network_rail_controller.info=Connection Type
 gui.computercarts.general.confirm=Confirm
 gui.computercarts.general.success=Success
 gui.computercarts.general.failed=Failed!
 gui.computercarts.remotem.chpass=Change Password:
 gui.computercarts.remotem.remmodule=Remove Module
+gui.computercarts.remotem.notfound=No Module Found.
+gui.computercarts.remotem.noinst=No Module installable.
 
 #Tooltip for Items
 tooltip.computercarts.instcomponents=Installed Components

@@ -30,7 +30,7 @@ public class CartController implements ManagedEnvironment {
 
     public CartController(EntityComputerCart cart) {
         this.cart = cart;
-        node = API.network.newNode(this, Visibility.Neighbors).withComponent("computercart").create();
+        this.node = API.network.newNode(this, Visibility.Neighbors).withComponent("computercart").create();
     }
 
     @Override
@@ -51,15 +51,15 @@ public class CartController implements ManagedEnvironment {
     }
 
     @Override
-    public void load(NBTTagCompound nbt) {
-        if (nbt.hasKey("node")) this.node.load(nbt.getCompoundTag("node"));
+    public void load(NBTTagCompound input) {
+        if (input.hasKey("node")) this.node.load(input.getCompoundTag("node"));
     }
 
     @Override
-    public void save(NBTTagCompound nbt) {
+    public void save(NBTTagCompound output) {
         NBTTagCompound node = new NBTTagCompound();
         this.node.save(node);
-        nbt.setTag("node", node);
+        output.setTag("node", node);
     }
 
     @Override
@@ -161,7 +161,7 @@ public class CartController implements ManagedEnvironment {
     @Callback(doc = "function([slot:number]):number -- Get the currently selected slot; set the selected slot if specified.")
     public Object[] select(Context context, Arguments args) {
         int slot = args.optInteger(0, 0);
-        if (slot > 0 && slot <= this.cart.maininv.getMaxSizeInventory()) {
+        if (slot > 0 && slot <= this.cart.mainInventory.getMaxSizeInventory()) {
             this.cart.setSelectedSlot(slot - 1);
         } else if (args.count() > 0) {
             throw new IllegalArgumentException("invalid slot");
@@ -257,13 +257,13 @@ public class CartController implements ManagedEnvironment {
 
     @Callback(doc = "function():number -- The number of tanks installed in the device.")
     public Object[] tankCount(Context context, Arguments args) {
-        return new Object[]{this.cart.tankcount()};
+        return new Object[]{this.cart.tanks.tankCount()};
     }
 
     @Callback(doc = "function([index:number]):number -- Select a tank and/or get the number of the currently selected tank.")
     public Object[] selectTank(Context context, Arguments args) {
         int index = args.optInteger(0, 0);
-        if (index > 0 && index <= this.cart.tankcount())
+        if (index > 0 && index <= this.cart.tanks.tankCount())
             this.cart.setSelectedTank(index);
         else if (args.count() > 0)
             throw new IllegalArgumentException("invalid tank index");
@@ -274,24 +274,24 @@ public class CartController implements ManagedEnvironment {
     public Object[] tankLevel(Context context, Arguments args) {
         int index = args.optInteger(0, 0);
         index = args.count() > 0 ? index : this.cart.selectedTank();
-        if (!(index > 0 && index <= this.cart.tankcount())) {
+        if (!(index > 0 && index <= this.cart.tanks.tankCount())) {
             if (args.count() < 1)
                 return new Object[]{false, "no tank selected"};
             throw new IllegalArgumentException("invalid tank index");
         }
-        return new Object[]{this.cart.getTank(index).getFluidAmount()};
+        return new Object[]{this.cart.tanks.getFluidTank(index).getFluidAmount()};
     }
 
     @Callback(direct = true, doc = "function([index:number]):number -- Get the remaining fluid capacity in the specified or selected tank.")
     public Object[] tankSpace(Context context, Arguments args) {
         int index = args.optInteger(0, 0);
         index = args.count() > 0 ? index : this.cart.selectedTank();
-        if (!(index > 0 && index <= this.cart.tankcount())) {
+        if (!(index > 0 && index <= this.cart.tanks.tankCount())) {
             if (args.count() < 1)
                 return new Object[]{false, "no tank selected"};
             throw new IllegalArgumentException("invalid tank index");
         }
-        IFluidTank tank = this.cart.getTank(index);
+        IFluidTank tank = this.cart.tanks.getFluidTank(index);
         return new Object[]{tank.getCapacity() - tank.getFluidAmount()};
     }
 
@@ -299,13 +299,13 @@ public class CartController implements ManagedEnvironment {
     public Object[] compareFluidTo(Context context, Arguments args) {
         int tankA = args.checkInteger(0);
         int tankB = this.cart.selectedTank();
-        if (!(tankA > 0 && tankA <= this.cart.tankcount()))
+        if (!(tankA > 0 && tankA <= this.cart.tanks.tankCount()))
             throw new IllegalArgumentException("invalid tank index");
-        if (!(tankB > 0 && tankB <= this.cart.tankcount()))
+        if (!(tankB > 0 && tankB <= this.cart.tanks.tankCount()))
             return new Object[]{false, "no tank selected"};
 
-        FluidStack stackA = this.cart.getTank(tankA).getFluid();
-        FluidStack stackB = this.cart.getTank(tankB).getFluid();
+        FluidStack stackA = this.cart.tanks.getFluidTank(tankA).getFluid();
+        FluidStack stackB = this.cart.tanks.getFluidTank(tankB).getFluid();
         boolean res = stackA == null && stackB == null;
         if (!res && stackA != null && stackB != null)
             res = stackA.isFluidEqual(stackB);
@@ -314,15 +314,15 @@ public class CartController implements ManagedEnvironment {
 
     @Callback(doc = "function(index:number[, count:number=1000]):boolean -- Move the specified amount of fluid from the selected tank into the specified tank.")
     public Object[] transferFluidTo(Context context, Arguments args) {
-        int targetTank = args.checkInteger(0);
+        int targetFluidTank = args.checkInteger(0);
         int selectedTank = this.cart.selectedTank();
         int count = args.optInteger(1, 1000);
-        if (!(targetTank > 0 && targetTank <= this.cart.tankcount()))
+        if (!(targetFluidTank > 0 && targetFluidTank <= this.cart.tanks.tankCount()))
             throw new IllegalArgumentException("invalid tank index");
-        if (!(selectedTank > 0 && selectedTank <= this.cart.tankcount()))
+        if (!(selectedTank > 0 && selectedTank <= this.cart.tanks.tankCount()))
             return new Object[]{false, "no tank selected"};
-        IFluidTank from = this.cart.getTank(selectedTank);
-        IFluidTank to = this.cart.getTank(targetTank);
+        IFluidTank from = this.cart.tanks.getFluidTank(selectedTank);
+        IFluidTank to = this.cart.tanks.getFluidTank(targetFluidTank);
         if (to == null) return new Object[]{false, "no tank found"};
 
         if (from.getFluid() == null || from.getFluid().isFluidEqual(to.getFluid()))
@@ -449,7 +449,7 @@ public class CartController implements ManagedEnvironment {
         if (side == null)
             throw new IllegalArgumentException("invalid side");
         int selectedTank = this.cart.selectedTank();
-        if (!(selectedTank > 0 && selectedTank <= this.cart.tankcount()))
+        if (!(selectedTank > 0 && selectedTank <= this.cart.tanks.tankCount()))
             return new Object[]{false, "no tank selected"};
 
         EnumFacing dir = this.cart.toGlobal(side);
@@ -460,7 +460,7 @@ public class CartController implements ManagedEnvironment {
         BlockPos pos = new BlockPos(x, y, z);
 
         IFluidHandler from = TankUtil.getFluidHandler(this.cart.world(), pos, dir.getOpposite());
-        FluidStack st = this.cart.getTank(selectedTank).getFluid();
+        FluidStack st = this.cart.tanks.getFluidTank(selectedTank).getFluid();
         if (from == null) return new Object[]{false};
         return new Object[]{TankUtil.hasFluid(from, st)};
     }
@@ -472,7 +472,7 @@ public class CartController implements ManagedEnvironment {
             throw new IllegalArgumentException("invalid side");
         int amount = args.optInteger(1, 1000);
         int selectedTank = this.cart.selectedTank();
-        if (!(selectedTank > 0 && selectedTank <= this.cart.tankcount()))
+        if (!(selectedTank > 0 && selectedTank <= this.cart.tanks.tankCount()))
             return new Object[]{false, "no tank selected"};
 
         EnumFacing dir = this.cart.toGlobal(side);
@@ -482,7 +482,7 @@ public class CartController implements ManagedEnvironment {
 
         BlockPos pos = new BlockPos(x, y, z);
 
-        IFluidTank from = this.cart.getTank(selectedTank);
+        IFluidTank from = this.cart.tanks.getFluidTank(selectedTank);
         IFluidHandler to = TankUtil.getFluidHandler(this.cart.world(), pos, dir.getOpposite());
         if (to == null) return new Object[]{false, "no tank found"};
 
@@ -508,7 +508,7 @@ public class CartController implements ManagedEnvironment {
             throw new IllegalArgumentException("invalid side");
         int amount = args.optInteger(1, 1000);
         int stank = this.cart.selectedTank();
-        if (!(stank > 0 && stank <= this.cart.tankcount()))
+        if (!(stank > 0 && stank <= this.cart.tanks.tankCount()))
             return new Object[]{false, "no tank selected"};
 
         EnumFacing dir = this.cart.toGlobal(side);
@@ -518,7 +518,7 @@ public class CartController implements ManagedEnvironment {
 
         BlockPos pos = new BlockPos(x, y, z);
 
-        IFluidTank from = this.cart.getTank(stank);
+        IFluidTank from = this.cart.tanks.getFluidTank(stank);
         IFluidHandler to = TankUtil.getFluidHandler(this.cart.world(), pos, dir.getOpposite());
         if (to == null) return new Object[]{false, "no tank found"};
 

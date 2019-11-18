@@ -4,8 +4,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import li.cil.oc.api.API;
 import li.cil.oc.api.Manual;
-import li.cil.oc.api.driver.DriverItem;
-import li.cil.oc.api.driver.item.Inventory;
 import li.cil.oc.api.driver.item.Slot;
 import li.cil.oc.api.internal.Keyboard;
 import li.cil.oc.api.internal.MultiTank;
@@ -20,19 +18,16 @@ import mods.computercarts.Settings;
 import mods.computercarts.common.SyncEntity;
 import mods.computercarts.common.blocks.NetRail;
 import mods.computercarts.common.component.CartController;
-import mods.computercarts.common.driver.CustomDriver;
-import mods.computercarts.common.inventory.ComponentInventory;
-import mods.computercarts.common.inventory.ComputerCartInventory;
+import mods.computercarts.common.inventory.InventoryCartComponents;
+import mods.computercarts.common.inventory.InventoryCartContainer;
 import mods.computercarts.common.items.ModItems;
+import mods.computercarts.common.tank.TankCart;
 import mods.computercarts.common.util.ComputerCartData;
 import mods.computercarts.common.util.ItemUtil;
 import mods.computercarts.common.util.RotationHelper;
 import mods.computercarts.network.ModNetwork;
-import mods.computercarts.network.message.ComputercartInventoryUpdate;
-import mods.computercarts.network.message.EntitySyncRequest;
-import mods.computercarts.network.message.UpdateRunning;
+import mods.computercarts.network.message.MessageEntitySyncRequest;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryBasic;
@@ -52,8 +47,10 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fluids.IFluidTank;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.wrapper.InvWrapper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -63,22 +60,17 @@ import java.util.UUID;
 
 public class EntityComputerCart extends EntityAdvancedCart implements MachineHost, Analyzable, SyncEntity, ComputerCart {
     protected static final DataParameter<Integer> LIGHT_COLOR = EntityDataManager.createKey(EntityComputerCart.class, DataSerializers.VARINT);
+    protected static final DataParameter<Boolean> RUNNING = EntityDataManager.createKey(EntityComputerCart.class, DataSerializers.BOOLEAN);
 
     private final boolean isServer = FMLCommonHandler.instance().getEffectiveSide().isServer();
 
     private int tier = -1;    //The tier of the cart
     private Machine machine; //The machine object
-    private boolean firstupdate = true; //true if the update() function gets called the first time
+    private boolean setup = true; //true if the update() function gets called the first time
     private boolean chDim = false;    //true if the cart changing the dimension (Portal, AE2 Storage,...)
-    private boolean isRun = false; //true if the machine is turned on;
     private CartController controller = new CartController(this); //The computer cart component
-    private double startEnergy = -1; //Only used when placing the cart. Start energy stored in the item
-    private int invsize = 0; //The current inventory size depending on the Inventory Upgrades
     private boolean onrail = false; // Store onRail from last tick to send a Signal
-    private int selSlot = 0; //The index of the current selected slot
-    private int selTank = 1; //The index of the current selected tank
     private Player player; //OC's fake player
-    private String name; //name of the cart
 
     private BlockPos cRail = BlockPos.ORIGIN;    // Position of the connected Network Rail
     private int cRailDim = 0;
@@ -86,27 +78,16 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
     private Node cRailNode = null; // This node will not get saved in NBT because it should automatic disconnect after restart;
 
 
-    public ComponentInventory compinv = new ComponentInventory(this) {
-
-        @Override
-        public int getSizeInventory() {
-            // 9 Upgrade Slots; 3 Container Slots; 8 Component Slots(CPU,Memory,...); 3 Provided Container Slots (the Container Slots in the GUI)
-            return 23;
-        }
-
+    public InventoryCartComponents componentInventory = new InventoryCartComponents(this, 24) {
         @Override
         protected void onItemAdded(int slot, ItemStack stack) {
-            if (FMLCommonHandler.instance().getEffectiveSide().isServer()) {
-                super.onItemAdded(slot, stack);
-                ((EntityComputerCart) this.host).synchronizeComponentSlot(slot);
-            }
+            super.onItemAdded(slot, stack);
+            EntityComputerCart cart = EntityComputerCart.this;
 
-            if (this.getSlotType(slot).equals(Slot.Floppy)) Sound$.MODULE$.playDiskInsert(this.host);
-            else if (this.getSlotType(slot).equals(Slot.Upgrade) && FMLCommonHandler.instance().getEffectiveSide().isServer()) {
-                DriverItem drv = CustomDriver.driverFor(stack, this.host.getClass());
-                if (drv instanceof Inventory) {
-                    ((EntityComputerCart) host).setInventorySpace(0);
-                    ((EntityComputerCart) host).checkInventorySpace();
+            if (!cart.world.isRemote) {
+                String slotType = this.getSlotType(slot);
+                if (slotType.equals(Slot.Floppy)) {
+                    Sound$.MODULE$.playDiskInsert(this.host);
                 }
             }
         }
@@ -114,16 +95,24 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
         @Override
         protected void onItemRemoved(int slot, ItemStack stack) {
             super.onItemRemoved(slot, stack);
-            if (FMLCommonHandler.instance().getEffectiveSide().isServer())
-                ((EntityComputerCart) this.host).synchronizeComponentSlot(slot);
+            EntityComputerCart cart = EntityComputerCart.this;
 
-            if (this.getSlotType(slot).equals(Slot.Floppy)) Sound$.MODULE$.playDiskEject(this.host);
-            else if (this.getSlotType(slot).equals(Slot.Upgrade) && FMLCommonHandler.instance().getEffectiveSide().isServer()) {
-                DriverItem drv = CustomDriver.driverFor(stack, this.host.getClass());
-                if (drv instanceof Inventory) {
-                    ((EntityComputerCart) host).setInventorySpace(0);
-                    ((EntityComputerCart) host).checkInventorySpace();
+            if (!cart.world.isRemote) {
+                String slotType = this.getSlotType(slot);
+
+                if (slotType.equals(Slot.Floppy)) {
+                    Sound$.MODULE$.playDiskEject(this.host);
                 }
+            }
+        }
+
+        @Override
+        public void markDirty() {
+            super.markDirty();
+            if (!EntityComputerCart.this.world().isRemote) {
+                mainInventory.recalculateSize();
+                tanks.recalculateSize();
+                ModNetwork.CHANNEL.sendToServer(new MessageEntitySyncRequest(EntityComputerCart.this));
             }
         }
 
@@ -146,42 +135,28 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
         }
     };
 
-    public InventoryBasic eqinv = new InventoryBasic("equipment", false, 0);
-    public ComputerCartInventory maininv = new ComputerCartInventory(this);
-
-    public MultiTank tanks = new MultiTank() {
-        @Override
-        public int tankCount() {
-            return EntityComputerCart.this.tankcount();
-        }
-
-        @Override
-        public IFluidTank getFluidTank(int index) {
-            return EntityComputerCart.this.getTank(index);
-        }
-    };
+    public InventoryBasic equipmentInventory = new InventoryBasic("equipment", false, 0);
+    public InventoryCartContainer mainInventory = new InventoryCartContainer(this);
+    public TankCart tanks = new TankCart(this);
 
     public EntityComputerCart(World world) {
         super(world);
     }
 
-    public EntityComputerCart(World w, double x, double y, double z, ComputerCartData data) {
+    public EntityComputerCart(World w, double x, double y, double z, @Nonnull ComputerCartData data) {
         super(w, x, y, z);
-        if (data == null) {
-            this.setDead();
-            data = new ComputerCartData();
-        }
         this.tier = data.getTier();
-        this.startEnergy = data.getEnergy();
+        ((Connector) this.machine.node()).changeBuffer(data.getEnergy());
         //this.setEmblem(data.getEmblem());
 
         for (Int2ObjectMap.Entry<ItemStack> e : data.getComponents().int2ObjectEntrySet()) {
-            if (e.getIntKey() < this.compinv.getSizeInventory() && e.getValue() != null) {
-                compinv.updateSlot(e.getIntKey(), e.getValue());
+            if (e.getIntKey() < this.componentInventory.getSizeInventory() && !e.getValue().isEmpty()) {
+                componentInventory.updateSlot(e.getIntKey(), e.getValue());
             }
         }
 
-        this.checkInventorySpace();
+        this.mainInventory.recalculateSize();
+        this.tanks.recalculateSize();
     }
 
     @Override
@@ -189,6 +164,7 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
         super.entityInit();
 
         this.dataManager.register(LIGHT_COLOR, 0x0000FF);
+        this.dataManager.register(RUNNING, false);
 
         this.machine = li.cil.oc.api.Machine.create(this);
         if (FMLCommonHandler.instance().getEffectiveSide().isServer()) {
@@ -200,49 +176,48 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
 
     /*------NBT/Sync-Stuff-------*/
     @Override
-    public void readEntityFromNBT(NBTTagCompound nbt) {
-        super.readEntityFromNBT(nbt);
+    public void readEntityFromNBT(NBTTagCompound input) {
+        super.readEntityFromNBT(input);
 
-        if (nbt.hasKey("components")) this.compinv.readNBT((NBTTagList) nbt.getTag("components"));
-        if (nbt.hasKey("controller")) this.controller.load(nbt.getCompoundTag("controller"));
-        if (nbt.hasKey("inventory")) this.maininv.readFromNBT((NBTTagList) nbt.getTag("inventory"));
-        if (nbt.hasKey("netrail")) {
-            NBTTagCompound netrail = nbt.getCompoundTag("netrail");
+        if (input.hasKey("components")) this.componentInventory.readNBT((NBTTagList) input.getTag("components"));
+        if (input.hasKey("controller")) this.controller.load(input.getCompoundTag("controller"));
+        if (input.hasKey("inventory")) this.mainInventory.readFromNBT(input.getCompoundTag("inventory"));
+        if (input.hasKey("netrail")) {
+            NBTTagCompound netrail = input.getCompoundTag("netrail");
             this.cRailCon = true;
             this.cRail = new BlockPos(netrail.getInteger("posX"), netrail.getInteger("posY"), netrail.getInteger("posZ"));
             this.cRailDim = netrail.getInteger("posDim");
         }
-        if (nbt.hasKey("settings")) {
-            NBTTagCompound set = nbt.getCompoundTag("settings");
+        if (input.hasKey("settings")) {
+            NBTTagCompound set = input.getCompoundTag("settings");
             if (set.hasKey("lightcolor")) this.setLightColor(set.getInteger("lightcolor"));
-            if (set.hasKey("selectedslot")) this.selSlot = set.getInteger("selectedslot");
-            if (set.hasKey("selectedtank")) this.selTank = set.getInteger("selectedtank");
             if (set.hasKey("tier")) this.tier = set.getInteger("tier");
         }
 
 
         this.machine.onHostChanged();
-        if (nbt.hasKey("machine")) this.machine.load(nbt.getCompoundTag("machine"));
+        if (input.hasKey("machine")) this.machine.load(input.getCompoundTag("machine"));
 
         this.connectNetwork();
-        this.checkInventorySpace();
+        this.mainInventory.recalculateSize();
+        this.tanks.recalculateSize();
     }
 
     @Override
-    public void writeEntityToNBT(NBTTagCompound nbt) {
+    public void writeEntityToNBT(NBTTagCompound output) {
         if (!this.isServer) return;
 
-        super.writeEntityToNBT(nbt);
+        super.writeEntityToNBT(output);
 
-        this.compinv.saveComponents();
+        this.componentInventory.saveComponents();
 
-        nbt.setTag("components", this.compinv.writeNTB());
-        nbt.setTag("inventory", this.maininv.writeToNBT());
+        output.setTag("components", this.componentInventory.writeNTB());
+        output.setTag("inventory", this.mainInventory.writeToNBT());
 
         //Controller tag
         NBTTagCompound controller = new NBTTagCompound();
         this.controller.save(controller);
-        nbt.setTag("controller", controller);
+        output.setTag("controller", controller);
 
         //Data about the connected rail
         if (this.cRailCon) {
@@ -251,87 +226,79 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
             netrail.setInteger("posY", this.cRail.getY());
             netrail.setInteger("posZ", this.cRail.getZ());
             netrail.setInteger("posDim", this.cRailDim);
-            nbt.setTag("netrail", netrail);
-        } else if (nbt.hasKey("netrail")) nbt.removeTag("netrail");
+            output.setTag("netrail", netrail);
+        } else if (output.hasKey("netrail")) output.removeTag("netrail");
 
         //Some additional values like light color, selected Slot, ...
         NBTTagCompound set = new NBTTagCompound();
         set.setInteger("lightcolor", this.getLightColor());
-        set.setInteger("selectedslot", this.selSlot);
-        set.setInteger("selectedtank", this.selTank);
         set.setInteger("tier", this.tier);
-        nbt.setTag("settings", set);
+        output.setTag("settings", set);
 
         NBTTagCompound machine = new NBTTagCompound();
         this.machine.save(machine);
-        nbt.setTag("machine", machine);
+        output.setTag("machine", machine);
     }
 
     @Override
-    public void writeSyncData(NBTTagCompound nbt) {
-        this.compinv.saveComponents();
-        nbt.setTag("components", this.compinv.writeNTB());
-        nbt.setBoolean("isRunning", this.isRun);
+    public NBTTagCompound writeSyncData(NBTTagCompound output) {
+        this.componentInventory.saveComponents();
+        output.setTag("components", this.componentInventory.writeNTB());
+        return output;
     }
 
     @Override
-    public void readSyncData(NBTTagCompound nbt) {
-        this.compinv.readNBT((NBTTagList) nbt.getTag("components"));
-        this.isRun = nbt.getBoolean("isRunning");
-        this.compinv.connectComponents();
+    public void readSyncData(NBTTagCompound input) {
+        this.componentInventory.readNBT((NBTTagList) input.getTag("components"));
+        this.componentInventory.connectComponents();
     }
 
-    /*--------------------*/
-
-    /*------Interaction-------*/
-
-    protected void checkInventorySpace() {
-        for (int i = 0; i < this.compinv.getSizeInventory(); i += 1) {
-            if (!this.compinv.getStackInSlot(i).isEmpty()) {
-                ItemStack stack = this.compinv.getStackInSlot(i);
-                DriverItem drv = CustomDriver.driverFor(stack, this.getClass());
-                if (drv instanceof Inventory && this.invsize < this.maininv.getMaxSizeInventory()) {
-                    this.invsize = this.invsize + ((Inventory) drv).inventoryCapacity(stack);
-                    if (this.invsize > this.maininv.getMaxSizeInventory())
-                        this.invsize = this.maininv.getMaxSizeInventory();
-                }
-            }
+    @Override
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing side) {
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+            return true;
         }
-        Iterable<ItemStack> over = this.maininv.removeOverflowItems(this.invsize);
-        ItemUtil.dropItems(over, this.world, this.posX, this.posY, this.posZ, true);
+        return super.hasCapability(capability, side);
+    }
+
+    @Nullable
+    @Override
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing side) {
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+            return (T) new InvWrapper(this.mainInventory);
+        }
+        return super.getCapability(capability, side);
     }
 
     @Override
     public void onUpdate() {
         super.onUpdate();
-        //Only executed at the first function call
-        if (this.firstupdate) {
-            this.firstupdate = false;
-            //Request a entity data sync
-            if (this.world.isRemote) ModNetwork.CHANNEL.sendToServer(new EntitySyncRequest(this));
-            else {
-                if (this.startEnergy > 0)
-                    ((Connector) this.machine.node()).changeBuffer(this.startEnergy); //Give start energy
+
+        if (this.setup) {
+            this.setup = false;
+
+            if (this.world.isRemote) {
+                ModNetwork.CHANNEL.sendToServer(new MessageEntitySyncRequest(this));
+            } else {
                 if (this.machine.node().network() == null) {
-                    this.connectNetwork(); //Connect all nodes (Components & Controller)
+                    this.connectNetwork();
                 }
 
-                this.onrail = this.onRail();  //Update onRail Value
-                this.player = new li.cil.oc.server.agent.Player(this);  //Set the fake Player
+                this.onrail = this.onRail();
+                this.player = new li.cil.oc.server.agent.Player(this);
             }
         }
 
         if (!this.world.isRemote) {
             //Update the machine and the Components
-            if (this.isRun) {
+            if (this.dataManager.get(RUNNING)) {
                 this.machine.update();
-                this.compinv.updateComponents();
+                this.componentInventory.updateComponents();
             }
             //Check if the machine state has changed.
-            if (this.isRun != this.machine.isRunning()) {
-                this.isRun = this.machine.isRunning();
-                ModNetwork.sendToNearPlayers(new UpdateRunning(this, this.isRun), this.posX, this.posY, this.posZ, this.world);
-                if (!this.isRun) this.setEngineSpeed(0);
+            if (this.dataManager.get(RUNNING) != this.machine.isRunning()) {
+                this.dataManager.set(RUNNING, this.machine.isRunning());
+                if (!this.dataManager.get(RUNNING)) this.setEngineSpeed(0);
             }
             //Consume energy for the Engine
             if (this.isEngineActive()) {
@@ -354,7 +321,7 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
 
     private void connectNetwork() {
         API.network.joinNewNetwork(machine.node());
-        this.compinv.connectComponents();
+        this.componentInventory.connectComponents();
         this.machine.node().connect(this.controller.node());
     }
 
@@ -365,9 +332,9 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
             this.machine.stop();
             this.machine.node().remove();
             this.controller.node().remove();
-            this.compinv.disconnectComponents();
-            this.compinv.saveComponents();
-            this.compinv.removeTagsForDrop();
+            this.componentInventory.disconnectComponents();
+            this.componentInventory.saveComponents();
+            this.componentInventory.removeTagsForDrop();
         }
     }
 
@@ -376,9 +343,9 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
         super.killMinecart(source);
         List<ItemStack> drop = new ArrayList<>();
         for (int i = 20; i < 23; i += 1) {
-            if (!compinv.getStackInSlot(i).isEmpty()) drop.add(compinv.getStackInSlot(i));
+            if (!componentInventory.getStackInSlot(i).isEmpty()) drop.add(componentInventory.getStackInSlot(i));
         }
-        for (ItemStack item : this.maininv.removeOverflowItems(0)) drop.add(item);
+        for (ItemStack item : this.mainInventory.removeOverflowItems(0)) drop.add(item);
         ItemUtil.dropItems(drop, this.world, this.posX, this.posY, this.posZ, true);
         this.setDamage(Float.MAX_VALUE); //Sometimes the cart stay alive this should fix it.
     }
@@ -454,17 +421,9 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
         }
     }
 
-    /*------------------------*/
-
-    /*-----Minecart/Entity-Stuff-------*/
-
     @Override
     public Type getType() {
         return null;
-    }
-
-    public static EntityMinecart create(World w, double x, double y, double z, ComputerCartData data) {
-        return new EntityComputerCart(w, x, y, z, data);
     }
 
     @Override
@@ -474,8 +433,8 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
 
         Int2ObjectMap<ItemStack> components = new Int2ObjectOpenHashMap<>();
         for (int i = 0; i < 20; i += 1) {
-            if (!compinv.getStackInSlot(i).isEmpty())
-                components.put(i, compinv.getStackInSlot(i));
+            if (!componentInventory.getStackInSlot(i).isEmpty())
+                components.put(i, componentInventory.getStackInSlot(i));
         }
 
         ComputerCartData data = new ComputerCartData();
@@ -500,14 +459,9 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
     }
 
     @Override
-    public boolean hasCustomName() {
-        return false;
-    }
-
-    @Override
     @Nonnull
     public ItemStack getPickedResult(RayTraceResult target) {
-        return ItemStack.EMPTY;
+        return getCartItem();
     }
 
     /*----------------------------------*/
@@ -544,17 +498,17 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
     @Override
     public Iterable<ItemStack> internalComponents() {
         List<ItemStack> components = new ArrayList<>();
-        for (int i = 0; i < compinv.getSizeInventory(); i += 1) {
-            if (!compinv.getStackInSlot(i).isEmpty() && this.compinv.isComponentSlot(i, compinv.getStackInSlot(i)))
-                components.add(compinv.getStackInSlot(i));
+        for (int i = 0; i < componentInventory.getSizeInventory(); i += 1) {
+            if (!componentInventory.getStackInSlot(i).isEmpty() && this.componentInventory.isComponentSlot(i, componentInventory.getStackInSlot(i)))
+                components.add(componentInventory.getStackInSlot(i));
         }
         return components;
     }
 
     @Override
     public int componentSlot(String address) {
-        for (int i = 0; i < this.compinv.getSizeInventory(); i += 1) {
-            ManagedEnvironment env = this.compinv.getSlotComponent(i);
+        for (int i = 0; i < this.componentInventory.getSizeInventory(); i += 1) {
+            ManagedEnvironment env = this.componentInventory.getSlotComponent(i);
             if (env != null && env.node() != null && env.node().address().equals(address)) return i;
         }
         return -1;
@@ -568,12 +522,12 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
 
     @Override
     public IInventory equipmentInventory() {
-        return this.eqinv;
+        return this.equipmentInventory;
     }
 
     @Override
     public IInventory mainInventory() {
-        return this.maininv;
+        return this.mainInventory;
     }
 
     @Override
@@ -583,24 +537,24 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
 
     @Override
     public int selectedSlot() {
-        return this.selSlot;
+        return this.mainInventory.getSelectedSlot();
     }
 
     @Override
     public void setSelectedSlot(int index) {
-        if (index < this.maininv.getSizeInventory())
-            this.selSlot = index;
+        if (index < this.mainInventory.getSizeInventory())
+            this.setSelectedTank(index);
     }
 
     @Override
     public int selectedTank() {
-        return this.selTank;
+        return this.tanks.getSelectedTank();
     }
 
     @Override
     public void setSelectedTank(int index) {
         if (index <= this.tank().tankCount())
-            this.selTank = index;
+            this.tanks.setSelectedTank(index);
     }
 
     @Override
@@ -662,39 +616,6 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
     public int tier() {
         return this.tier;
     }
-    /*-----------------------------*/
-
-    /*-------Inventory--------*/
-
-    @Override
-    public int getSizeInventory() {
-        return this.maininv.getSizeInventory();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return this.maininv.isEmpty();
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        return this.maininv.getStackInSlot(slot);
-    }
-
-    @Override
-    public ItemStack decrStackSize(int slot, int amount) {
-        return this.maininv.decrStackSize(slot, amount);
-    }
-
-    @Override
-    public ItemStack removeStackFromSlot(int slot) {
-        return this.maininv.removeStackFromSlot(slot);
-    }
-
-    @Override
-    public void setInventorySlotContents(int slot, ItemStack stack) {
-        this.maininv.setInventorySlotContents(slot, stack);
-    }
 
     @Override
     public String getName() {
@@ -706,79 +627,11 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
         return new TextComponentTranslation(getName());
     }
 
-    @Override
-    public int getInventoryStackLimit() {
-        return this.maininv.getInventoryStackLimit();
-    }
-
-    @Override
-    public void markDirty() {}
-
-    @Override
-    public boolean isUsableByPlayer(@Nonnull EntityPlayer player) {
-        return player.getDistanceSq(this) <= 64 && !this.isDead;
-    }
-
-    @Override
-    public void openInventory(@Nonnull EntityPlayer player) {}
-
-    @Override
-    public void closeInventory(@Nonnull EntityPlayer player) {}
-
-    @Override
-    public boolean isItemValidForSlot(int slot, @Nonnull ItemStack stack) {
-        return this.maininv.isItemValidForSlot(slot, stack);
-    }
-
-    @Override
-    public int getField(int field) {
-        return this.maininv.getField(field);
-    }
-
-    @Override
-    public void setField(int field, int value) {
-        this.maininv.setField(field, value);
-    }
-
-    @Override
-    public int getFieldCount() {
-        return this.maininv.getFieldCount();
-    }
-
-    @Override
-    public void clear() {
-        this.maininv.clear();
-    }
-
-    /*------Tanks-------*/
-
-    public int tankcount() {
-        int c = 0;
-        for (int i = 0; i < this.compinv.getSizeInventory(); i += 1) {
-            if (this.compinv.getSlotComponent(i) instanceof IFluidTank) {
-                c += 1;
-            }
-        }
-        return c;
-    }
-
-    public IFluidTank getTank(int index) {
-        int c = 0;
-        for (int i = 0; i < this.compinv.getSizeInventory(); i += 1) {
-            if (this.compinv.getSlotComponent(i) instanceof IFluidTank) {
-                c += 1;
-                if (c == index) return (IFluidTank) this.compinv.getSlotComponent(i);
-            }
-        }
-        return null;
-    }
-    /*--------------------*/
-
     /*-----Component-Inv------*/
     @Override
     public int componentCount() {
         int count = 0;
-        for (ManagedEnvironment managedEnvironment : this.compinv.getComponents()) {
+        for (ManagedEnvironment component : this.componentInventory.getComponents()) {
             count += 1;
         }
         return count;
@@ -786,14 +639,8 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
 
     @Override
     public Environment getComponentInSlot(int index) {
-        if (index >= this.compinv.getSizeInventory()) return null;
-        return this.compinv.getSlotComponent(index);
-    }
-
-    @Override
-    public void synchronizeComponentSlot(int slot) {
-        if (!this.world.isRemote)
-            ModNetwork.sendToNearPlayers(new ComputercartInventoryUpdate(this, slot, this.compinv.getStackInSlot(slot)), this.posX, this.posY, this.posZ, this.world);
+        if (index >= this.componentInventory.getSizeInventory()) return null;
+        return this.componentInventory.getSlotComponent(index);
     }
 
     /*---------Railcraft---------*/
@@ -805,20 +652,24 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
     }
 
     /*------Setters & Getters-----*/
-    public ComponentInventory getCompinv() {
-        return this.compinv;
+    public InventoryCartComponents getComponentInventory() {
+        return this.componentInventory;
     }
 
     public void setRunning(boolean running) {
-        if (this.world.isRemote) this.isRun = running;
-        else {
-            if (running) this.machine.start();
-            else this.machine.stop();
+        if (this.world.isRemote) {
+            this.dataManager.set(RUNNING, running);
+        } else {
+            if (running) {
+                this.machine.start();
+            } else {
+                this.machine.stop();
+            }
         }
     }
 
-    public boolean getRunning() {
-        return this.isRun;
+    public boolean isRunning() {
+        return this.dataManager.get(RUNNING);
     }
 
     public double getCurEnergy() {
@@ -831,12 +682,8 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
         return -1;
     }
 
-    protected void setInventorySpace(int invsize) {
-        this.invsize = invsize;
-    }
-
     public int getInventorySpace() {
-        return this.invsize;
+        return this.mainInventory.getSizeInventory();
     }
 
     public boolean getBrakeState() {

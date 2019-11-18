@@ -12,13 +12,16 @@ import mezz.jei.api.IJeiRuntime;
 import mods.computercarts.ComputerCarts;
 import mods.computercarts.Settings;
 import mods.computercarts.client.SlotIcons;
-import mods.computercarts.client.gui.widget.*;
-import mods.computercarts.common.container.ComputerCartContainer;
-import mods.computercarts.common.container.slots.ContainerSlot;
-import mods.computercarts.common.inventory.ComponentInventory;
+import mods.computercarts.client.gui.widget.EnergyBar;
+import mods.computercarts.client.gui.widget.GuiUtil;
+import mods.computercarts.client.gui.widget.ImageButton;
+import mods.computercarts.client.gui.widget.SliderButton;
+import mods.computercarts.common.container.ContainerComputerCart;
+import mods.computercarts.common.container.slots.SlotComponent;
+import mods.computercarts.common.inventory.InventoryCartComponents;
 import mods.computercarts.common.minecart.EntityComputerCart;
 import mods.computercarts.network.ModNetwork;
-import mods.computercarts.network.message.GuiButtonClick;
+import mods.computercarts.network.message.MessagePowerButton;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiButton;
@@ -60,8 +63,8 @@ public class GuiComputerCart extends GuiContainer {
     private ResourceLocation ebar = new ResourceLocation(Settings.OC_ResLoc, "textures/gui/bar.png");
     private ResourceLocation selection = new ResourceLocation(Settings.OC_ResLoc, "textures/gui/robot_selection.png");
 
-    //Container (as INSTANCE of ComputerCartContainer)
-    private ComputerCartContainer container;
+    //Container (as INSTANCE of ContainerComputerCart)
+    private ContainerComputerCart container;
 
     //Textbuffer and keyboard
     private int txtWidth, txtHeight;
@@ -91,19 +94,19 @@ public class GuiComputerCart extends GuiContainer {
 //-------Init functions-------//
 
     public GuiComputerCart(InventoryPlayer inventory, EntityComputerCart entity) {
-        super(new ComputerCartContainer(inventory, entity));
-        this.container = (ComputerCartContainer) this.inventorySlots;
+        super(new ContainerComputerCart(inventory, entity));
+        this.container = (ContainerComputerCart) this.inventorySlots;
 
-        this.initComponents(entity.compinv);
+        this.initComponents(entity.componentInventory);
 
-        this.ySize = (container.getHasScreen()) ? ComputerCartContainer.YSIZE_SCR : ComputerCartContainer.YSIZE_NOSCR;
-        this.xSize = ComputerCartContainer.XSIZE;
-        this.offset = (this.textbuffer != null) ? ComputerCartContainer.DELTA : 0;
+        this.ySize = (container.getHasScreen()) ? ContainerComputerCart.YSIZE_SCR : ContainerComputerCart.YSIZE_NOSCR;
+        this.xSize = ContainerComputerCart.XSIZE;
+        this.offset = (this.textbuffer != null) ? ContainerComputerCart.DELTA : 0;
         this.invslider = new SliderButton(244, 8 + offset, 6, 13, 94);
     }
 
     //Initialize components. get Screen and check if there is a Keyboard
-    private void initComponents(ComponentInventory compinv) {
+    private void initComponents(InventoryCartComponents compinv) {
         for (ManagedEnvironment component : compinv.getComponents()) {
             if (component instanceof TextBuffer) this.textbuffer = (TextBuffer) component;
             else if (component instanceof li.cil.oc.server.component.Keyboard) this.hasKeyboard = true;
@@ -136,8 +139,6 @@ public class GuiComputerCart extends GuiContainer {
         return false;
     }
 
-//-------Override render functions-------//
-
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
         this.drawDefaultBackground();
@@ -151,7 +152,7 @@ public class GuiComputerCart extends GuiContainer {
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+        super.drawGuiContainerForegroundLayer(mouseX, mouseY);
         if (this.container.getHasScreen() && this.textbuffer != null) {
             this.drawBufferLayer();
 
@@ -176,7 +177,7 @@ public class GuiComputerCart extends GuiContainer {
         //Tooltips
         if (this.isPointInRegion(this.btPower.x, this.btPower.y, 18, 18, mouseX + this.guiLeft, mouseY + this.guiTop)) {
             List<String> ls = new ArrayList<>();
-            if (this.container.getEntity().getRunning()) {
+            if (this.container.getEntity().isRunning()) {
                 ls.add(I18n.translateToLocal("tooltip." + ComputerCarts.MODID + ".gui.turnoff"));
             } else {
                 ls.add(I18n.translateToLocal("tooltip." + ComputerCarts.MODID + ".gui.turnon"));
@@ -190,40 +191,37 @@ public class GuiComputerCart extends GuiContainer {
             ls.add("Energy: " + per + "% (" + this.container.sEnergy + " / " + this.container.smaxEnergy + ")");
             GuiUtil.drawHoverText(ls, mouseX - this.guiLeft, mouseY - this.guiTop, this.width, this.height, this.guiLeft, Minecraft.getMinecraft().fontRenderer);
         }
-
-        GL11.glPopAttrib();
     }
 
-    public void drawScreen(int mx, int my, float dt) {
+    @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.hoveredSlot = null;
         for (Slot slot : this.container.inventorySlots) {
             if (slot != null) {
-                if (this.isPointInRegion(slot.xPos, slot.yPos, 16, 16, mx, my))
+                if (this.isPointInRegion(slot.xPos, slot.yPos, 16, 16, mouseX, mouseY))
                     this.hoveredSlot = slot;
             }
         }
-        this.hoveredJEI = ItemSearch$.MODULE$.hoveredStack(this, mx, my).orEmpty();
+        this.hoveredJEI = ItemSearch$.MODULE$.hoveredStack(this, mouseX, mouseY).orEmpty();
 
-        super.drawScreen(mx, my, dt);
+        super.drawScreen(mouseX, mouseY, partialTicks);
 
         if (Loader.isModLoaded("jei")) {
             this.drawJEIHighlight();
         }
     }
 
-//-------Events-------//
-
+    @Override
     protected void actionPerformed(GuiButton button) {
-        switch (button.id) {
-            case 0:
-                ModNetwork.CHANNEL.sendToServer(GuiButtonClick.entityButtonClick(this.container.getEntity(), 0, 1));
-                break;
+        if (button.id == 0) {
+            ModNetwork.CHANNEL.sendToServer(new MessagePowerButton(this.container.getEntity()));
         }
     }
 
+    @Override
     public void updateScreen() {
-        if (this.container.getEntity().getRunning() != btPower.getToggle())
-            btPower.setToggle(this.container.getEntity().getRunning());
+        if (this.container.getEntity().isRunning() != btPower.getToggle())
+            btPower.setToggle(this.container.getEntity().isRunning());
         if (this.container.updatesize) {
             this.invslider.scrollTo(0);
             this.invslider.setMaxSteps(this.container.sizeinv / 4 - 4);
@@ -328,7 +326,7 @@ public class GuiComputerCart extends GuiContainer {
     private void updateSlots() {
         for (Slot s : this.container.inventorySlots) {
             int index = s.getSlotIndex() - this.invslider.getScroll() * 4;
-            if (s.inventory.equals(this.container.getEntity().maininv)) {
+            if (s.inventory.equals(this.container.getEntity().mainInventory)) {
                 if (index >= 0 && index < 16 && s.getSlotIndex() < this.container.sizeinv) {
                     s.xPos = 170 + (index % 4) * 18;
                     s.yPos = 8 + offset + (index / 4) * 18;
@@ -361,15 +359,15 @@ public class GuiComputerCart extends GuiContainer {
         EntityPlayerSP player = Minecraft.getMinecraft().player;
         if (player.inventory.getItemStack().isEmpty()) {
             boolean highlight = false;
-            if (!(slot instanceof ContainerSlot) || (!Objects.equals(((ContainerSlot) slot).getSlotType(), "none") && ((ContainerSlot) slot).getTier() != -1)) {
+            if (!(slot instanceof SlotComponent) || (!Objects.equals(((SlotComponent) slot).getSlotType(), "none") && ((SlotComponent) slot).getTier() != -1)) {
                 boolean inPlayerInv = slot.inventory == player.inventory;
                 if (this.hoveredSlot != null) {
-                    if (this.hoveredSlot.getHasStack() && (slot instanceof ContainerSlot) && slot.isItemValid(this.hoveredSlot.getStack()))
+                    if (this.hoveredSlot.getHasStack() && (slot instanceof SlotComponent) && slot.isItemValid(this.hoveredSlot.getStack()))
                         highlight = true;
-                    else if (slot.getHasStack() && (this.hoveredSlot instanceof ContainerSlot) && this.hoveredSlot.isItemValid(slot.getStack()))
+                    else if (slot.getHasStack() && (this.hoveredSlot instanceof SlotComponent) && this.hoveredSlot.isItemValid(slot.getStack()))
                         highlight = true;
                 } else {
-                    if (!this.hoveredJEI.isEmpty() && (slot instanceof ContainerSlot) && slot.isItemValid(this.hoveredJEI)) {
+                    if (!this.hoveredJEI.isEmpty() && (slot instanceof SlotComponent) && slot.isItemValid(this.hoveredJEI)) {
                         highlight = true;
                     }
                 }
@@ -414,14 +412,17 @@ public class GuiComputerCart extends GuiContainer {
     //Draw Screen if there is one
     private void drawBufferLayer() {
         GlStateManager.pushMatrix();
+
         GlStateManager.translate(bufferX, bufferY, 0);
         Minecraft.getMinecraft().entityRenderer.disableLightmap();
         RenderHelper.disableStandardItemLighting();
+
         GlStateManager.pushMatrix();
         GlStateManager.translate(-3, -3, 0);
         GlStateManager.color(1, 1, 1, 1);
         BufferRenderer.drawBackground();
         GlStateManager.popMatrix();
+
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
         double scaleX = bufferRenderWidth / this.textbuffer.renderWidth();
@@ -432,11 +433,11 @@ public class GuiComputerCart extends GuiContainer {
         } else if (scaleY > scale) {
             GlStateManager.translate(0, this.textbuffer.renderHeight() * (scaleY - scale) / 2, 0);
         }
-        GlStateManager.scale(scale, scale, scale);
-        GlStateManager.scale(this.bufferscale, this.bufferscale, 1);
+        GlStateManager.scale(this.bufferscale * scale, this.bufferscale * scale, scale);
         BufferRenderer.drawText(this.textbuffer);
         RenderHelper.enableStandardItemLighting();
         GlStateManager.disableBlend();
+
         GlStateManager.popMatrix();
     }
 
@@ -445,7 +446,6 @@ public class GuiComputerCart extends GuiContainer {
         this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         GlStateManager.enableBlend();
         GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-        GlStateManager.disableLighting();
 
         TextureAtlasSprite non = SlotIcons.fromTier(-1);
         if (non != null) {
@@ -454,8 +454,8 @@ public class GuiComputerCart extends GuiContainer {
 
         //Render the Icons for Container Slots
         for (Slot slot : this.container.inventorySlots) {
-            if (slot instanceof ContainerSlot) {
-                TextureAtlasSprite typeicon = SlotIcons.fromSlot(((ContainerSlot) slot).getSlotType());
+            if (slot instanceof SlotComponent) {
+                TextureAtlasSprite typeicon = SlotIcons.fromSlot(((SlotComponent) slot).getSlotType());
                 if (typeicon != null)
                     this.drawTexturedModalRect(this.guiLeft + slot.xPos, this.guiTop + slot.yPos, typeicon, 16, 16);
             }
@@ -472,6 +472,7 @@ public class GuiComputerCart extends GuiContainer {
                 }
             }
         }
+        GlStateManager.disableBlend();
     }
 
     private void drawSelection() {

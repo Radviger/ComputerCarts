@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import li.cil.oc.api.internal.TextBuffer;
 import li.cil.oc.api.network.ManagedEnvironment;
-import mods.computercarts.common.container.slots.ContainerSlot;
+import mods.computercarts.common.container.slots.SlotComponent;
 import mods.computercarts.common.minecart.EntityComputerCart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -17,7 +17,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 
-public class ComputerCartContainer extends Container {
+public class ContainerComputerCart extends Container {
 
     public static final int YSIZE_SCR = 256;
     public static final int YSIZE_NOSCR = 108;
@@ -35,18 +35,18 @@ public class ComputerCartContainer extends Container {
     public boolean updatesize = false;
 
 
-    public ComputerCartContainer(InventoryPlayer inventory, EntityComputerCart entity) {
+    public ContainerComputerCart(InventoryPlayer inventory, EntityComputerCart entity) {
         this.entity = entity;
         this.player = inventory.player;
 
-        this.initComponents(this.entity.getCompinv().getComponents());
+        this.initComponents(this.entity.getComponentInventory().getComponents());
 
-        this.addSlotToContainer(new ContainerSlot(entity.compinv, 20, 188, 232 - ((this.hasScreen) ? 0 : DELTA), entity.compinv.getContainer(0)));
-        this.addSlotToContainer(new ContainerSlot(entity.compinv, 21, 206, 232 - ((this.hasScreen) ? 0 : DELTA), entity.compinv.getContainer(1)));
-        this.addSlotToContainer(new ContainerSlot(entity.compinv, 22, 224, 232 - ((this.hasScreen) ? 0 : DELTA), entity.compinv.getContainer(2)));
+        this.addSlotToContainer(new SlotComponent(entity.componentInventory, 20, 188, 232 - ((this.hasScreen) ? 0 : DELTA), entity.componentInventory.getContainer(0)));
+        this.addSlotToContainer(new SlotComponent(entity.componentInventory, 21, 206, 232 - ((this.hasScreen) ? 0 : DELTA), entity.componentInventory.getContainer(1)));
+        this.addSlotToContainer(new SlotComponent(entity.componentInventory, 22, 224, 232 - ((this.hasScreen) ? 0 : DELTA), entity.componentInventory.getContainer(2)));
 
-        for (int i = 0; i < entity.maininv.getMaxSizeInventory(); i += 1) {
-            this.addSlotToContainer(new Slot(entity.maininv, i, -10000, -10000));
+        for (int i = 0; i < entity.mainInventory.getMaxSizeInventory(); i += 1) {
+            this.addSlotToContainer(new Slot(entity.mainInventory, i, -10000, -10000));
         }
 
         this.addPlayerInv(6, 174 - ((this.hasScreen) ? 0 : DELTA), inventory);
@@ -121,7 +121,7 @@ public class ComputerCartContainer extends Container {
     private IntList getCartInvSlots(ItemStack stack) {
         IntList slots = new IntArrayList();
         for (Slot slot : this.inventorySlots) {
-            if (slot.inventory.equals(this.entity.maininv) || slot.inventory.equals(this.entity.compinv)) {
+            if (slot.inventory.equals(this.entity.mainInventory) || slot.inventory.equals(this.entity.componentInventory)) {
                 slots.add(slot.slotNumber);
             }
         }

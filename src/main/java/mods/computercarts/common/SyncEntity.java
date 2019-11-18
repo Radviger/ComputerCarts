@@ -3,7 +3,7 @@ package mods.computercarts.common;
 import net.minecraft.nbt.NBTTagCompound;
 
 public interface SyncEntity {
-    void writeSyncData(NBTTagCompound nbt);
+    NBTTagCompound writeSyncData(NBTTagCompound output);
 
-    void readSyncData(NBTTagCompound nbt);
+    void readSyncData(NBTTagCompound input);
 }

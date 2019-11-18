@@ -1,7 +1,8 @@
 package mods.computercarts.common.container;
 
 import mods.computercarts.common.container.slots.SlotGhost;
-import mods.computercarts.common.tileentity.TileEntityNetworkRailBase;
+import mods.computercarts.common.tileentity.TileEntityNetworkRailController;
+import mods.computercarts.common.tileentity.TileEntityNetworkRailController.ConnectionMode;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
@@ -14,39 +15,34 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 
-public class NetworkRailBaseContainer extends Container {
+public class ContainerNetworkRailController extends Container {
 
-    private TileEntityNetworkRailBase entity;
-    private int oldMode;
+    private TileEntityNetworkRailController controller;
+    private ConnectionMode oldMode;
 
-    public NetworkRailBaseContainer(InventoryPlayer inventory, TileEntityNetworkRailBase entity) {
-        this.entity = entity;
+    public ContainerNetworkRailController(InventoryPlayer inventory, TileEntityNetworkRailController controller) {
+        this.controller = controller;
 
-        this.addSlotToContainer(new SlotGhost(entity, 0, 116, 35));
-        this.addPlayerInv(8, 84, inventory);
-    }
-
-    @Override
-    public boolean canInteractWith(EntityPlayer player) {
-        return entity.isUsableByPlayer(player);
-    }
-
-    private void addPlayerInv(int x, int y, InventoryPlayer inventory) {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 9; j++) {
-                this.addSlotToContainer(new Slot(inventory, j + i * 9 + 9, x + j * 18, y + i * 18));
+                this.addSlotToContainer(new Slot(inventory, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
             }
         }
 
         for (int i = 0; i < 9; i++) {
-            this.addSlotToContainer(new Slot(inventory, i, x + i * 18, y + 58));
+            this.addSlotToContainer(new Slot(inventory, i, 8 + i * 18, 84 + 58));
         }
+    }
+
+    @Override
+    public boolean canInteractWith(EntityPlayer player) {
+        return controller.isUsableByPlayer(player);
     }
 
     @Override
     public void addListener(IContainerListener listener) {
         super.addListener(listener);
-        listener.sendWindowProperty(this, 0, this.entity.getMode());
+        listener.sendWindowProperty(this, 0, this.controller.getMode().ordinal());
     }
 
     @Override
@@ -54,12 +50,12 @@ public class NetworkRailBaseContainer extends Container {
         super.detectAndSendChanges();
 
         for (IContainerListener listener : this.listeners) {
-            if (this.entity.getMode() != this.oldMode) {
-                listener.sendWindowProperty(this, 0, this.entity.getMode());
+            if (this.controller.getMode() != this.oldMode) {
+                listener.sendWindowProperty(this, 0, this.controller.getMode().ordinal());
             }
         }
 
-        this.oldMode = this.entity.getMode();
+        this.oldMode = this.controller.getMode();
     }
 
     @SideOnly(Side.CLIENT)
@@ -67,7 +63,7 @@ public class NetworkRailBaseContainer extends Container {
     public void updateProgressBar(int field, int value) {
         switch (field) {
             case 0:
-                this.entity.setMode(value);
+                this.controller.setMode(ConnectionMode.values()[value]);
                 break;
         }
     }
@@ -76,7 +72,7 @@ public class NetworkRailBaseContainer extends Container {
     @Nonnull
     public ItemStack transferStackInSlot(EntityPlayer player, int slot) {
         Slot s = this.getSlot(slot);
-        if (s == null || !s.getHasStack() || s.inventory.equals(entity)) return ItemStack.EMPTY;
+        if (s == null || !s.getHasStack()) return ItemStack.EMPTY;
         ItemStack nitem = s.getStack().copy();
         nitem.setCount(0);
         this.getSlot(0).putStack(nitem); // Slot 0 is the camo slot
@@ -96,9 +92,4 @@ public class NetworkRailBaseContainer extends Container {
         }
         return super.slotClick(slot, button, clickType, player);
     }
-
-    public TileEntityNetworkRailBase getTile() {
-        return entity;
-    }
-
 }

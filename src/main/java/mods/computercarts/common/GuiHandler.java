@@ -1,14 +1,14 @@
 package mods.computercarts.common;
 
 import mods.computercarts.client.gui.GuiComputerCart;
-import mods.computercarts.client.gui.GuiNetworkRailBase;
+import mods.computercarts.client.gui.GuiNetworkRailController;
 import mods.computercarts.client.gui.GuiRemoteModule;
-import mods.computercarts.common.container.ComputerCartContainer;
-import mods.computercarts.common.container.NetworkRailBaseContainer;
-import mods.computercarts.common.container.RemoteModuleContainer;
+import mods.computercarts.common.container.ContainerComputerCart;
+import mods.computercarts.common.container.ContainerNetworkRailController;
+import mods.computercarts.common.container.ContainerRemoteModule;
 import mods.computercarts.common.entityextend.RemoteExtenderRegister;
 import mods.computercarts.common.minecart.EntityComputerCart;
-import mods.computercarts.common.tileentity.TileEntityNetworkRailBase;
+import mods.computercarts.common.tileentity.TileEntityNetworkRailController;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,8 +26,8 @@ public class GuiHandler implements IGuiHandler {
             if (entity != null) {
                 switch (ID) {
                     case 0:
-                        if (entity instanceof TileEntityNetworkRailBase)
-                            return new NetworkRailBaseContainer(player.inventory, (TileEntityNetworkRailBase) entity);
+                        if (entity instanceof TileEntityNetworkRailController)
+                            return new ContainerNetworkRailController(player.inventory, (TileEntityNetworkRailController) entity);
                 }
             }
         } else {
@@ -36,11 +36,11 @@ public class GuiHandler implements IGuiHandler {
                 switch (ID) {
                     case 1:
                         if (entity instanceof EntityComputerCart)
-                            return new ComputerCartContainer(player.inventory, (EntityComputerCart) entity);
+                            return new ContainerComputerCart(player.inventory, (EntityComputerCart) entity);
                         break;
                     case 2:
                         if ((entity instanceof EntityMinecart) && RemoteExtenderRegister.isRemoteEnabled((EntityMinecart) entity)) {
-                            return new RemoteModuleContainer((EntityMinecart) entity);
+                            return new ContainerRemoteModule((EntityMinecart) entity);
                         }
                         break;
                 }
@@ -57,8 +57,8 @@ public class GuiHandler implements IGuiHandler {
             if (entity != null) {
                 switch (ID) {
                     case 0:
-                        if (entity instanceof TileEntityNetworkRailBase)
-                            return new GuiNetworkRailBase(player.inventory, (TileEntityNetworkRailBase) entity);
+                        if (entity instanceof TileEntityNetworkRailController)
+                            return new GuiNetworkRailController(player.inventory, (TileEntityNetworkRailController) entity);
                 }
             }
         } else {

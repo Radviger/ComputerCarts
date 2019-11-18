@@ -13,7 +13,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RemoteModuleContainer extends Container {
+public class ContainerRemoteModule extends Container {
 
     protected final boolean IS_SERVER = FMLCommonHandler.instance().getEffectiveSide().isServer();
     private RemoteCartExtender module;
@@ -28,15 +28,12 @@ public class RemoteModuleContainer extends Container {
 
     public boolean locked = false;
 
-    public RemoteModuleContainer() {
-        super();
-    }
+    public ContainerRemoteModule() {}
 
-    public RemoteModuleContainer(EntityMinecart cart) {
-        super();
-
-        if (IS_SERVER) toBan = new ArrayList<>();
-        else {
+    public ContainerRemoteModule(EntityMinecart cart) {
+        if (IS_SERVER) {
+            toBan = new ArrayList<>();
+        } else {
             passstate = 0;
             perm = false;
         }
@@ -48,7 +45,7 @@ public class RemoteModuleContainer extends Container {
     @Override
     public boolean canInteractWith(EntityPlayer player) {
         if (IS_SERVER) {
-            if (this.toBan.size() > 0 && this.toBan.contains(player)) return false;
+            if (this.toBan.contains(player)) return false;
             return player.world == cart.world && player.getDistanceSq(cart.posX, cart.posY, cart.posZ) <= 64 && module.isEnabled();
         }
         return true;

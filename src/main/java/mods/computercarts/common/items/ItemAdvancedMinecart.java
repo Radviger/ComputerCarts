@@ -19,8 +19,8 @@ import net.minecraft.world.World;
 
 public class ItemAdvancedMinecart extends Item {
 
-    protected static final IBehaviorDispenseItem MINECART_DISPENSE_BHAVIOR = new BehaviorDefaultDispenseItem() {
-        private final BehaviorDefaultDispenseItem behaviourDefaultDispenseItem = new BehaviorDefaultDispenseItem();
+    protected static final IBehaviorDispenseItem MINECART_DISPENSE_BEHAVIOR = new BehaviorDefaultDispenseItem() {
+        private final BehaviorDefaultDispenseItem defaultBehavior = new BehaviorDefaultDispenseItem();
 
         @Override
         public ItemStack dispenseStack(IBlockSource source, ItemStack item) {
@@ -37,7 +37,7 @@ public class ItemAdvancedMinecart extends Item {
                 offset = 0;
             } else {
                 if (state.getMaterial() != Material.AIR || !BlockRailBase.isRailBlock(world.getBlockState(pos.down()))) {
-                    return this.behaviourDefaultDispenseItem.dispense(source, item);
+                    return this.defaultBehavior.dispense(source, item);
                 }
 
                 offset = -1;
@@ -45,12 +45,14 @@ public class ItemAdvancedMinecart extends Item {
 
             EntityMinecart cart = ((ItemAdvancedMinecart) item.getItem()).create(world, d0, d1 + offset, d2, item);
 
-            if (item.hasDisplayName()) {
-                cart.setCustomNameTag(item.getDisplayName());
-            }
+            if (cart != null) {
+                if (item.hasDisplayName()) {
+                    cart.setCustomNameTag(item.getDisplayName());
+                }
 
-            world.spawnEntity(cart);
-            item.splitStack(1);
+                world.spawnEntity(cart);
+                item.splitStack(1);
+            }
             return item;
         }
 
@@ -61,7 +63,7 @@ public class ItemAdvancedMinecart extends Item {
     };
 
     protected ItemAdvancedMinecart() {
-        BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(this, MINECART_DISPENSE_BHAVIOR);
+        BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.putObject(this, MINECART_DISPENSE_BEHAVIOR);
         this.maxStackSize = 1;
     }
 
@@ -71,6 +73,10 @@ public class ItemAdvancedMinecart extends Item {
             ItemStack item = player.getHeldItem(hand);
             if (!world.isRemote) {
                 EntityMinecart cart = this.create(world, (float) pos.getX() + 0.5F, (float) pos.getY() + 0.5F, (float) pos.getZ() + 0.5F, item);
+
+                if (cart == null) {
+                    return EnumActionResult.FAIL;
+                }
 
                 if (item.hasDisplayName()) {
                     cart.setCustomNameTag(item.getDisplayName());
