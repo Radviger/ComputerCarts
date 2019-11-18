@@ -17,6 +17,7 @@ import mods.computercarts.Settings;
 import mods.computercarts.common.driver.CustomDriver;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -46,38 +47,27 @@ public abstract class InventoryCartComponents implements IInventory, Environment
 
     @Override
     public int getSizeInventory() {
-        return this.slots.size();
+        return slots.size();
     }
 
     @Override
     public @Nonnull ItemStack getStackInSlot(int slot) {
-        if (slot < this.getSizeInventory()) return this.slots.get(slot);
+        if (slot < getSizeInventory()) return slots.get(slot);
         return ItemStack.EMPTY;
     }
 
     @Override
-    public @Nonnull ItemStack decrStackSize(int slot, int number) {
-        if (slot >= 0 && slot < this.getSizeInventory()) {
-            if (number >= slots.get(slot).getCount()) {
-                ItemStack get = slots.get(slot);
-                slots.set(slot, ItemStack.EMPTY);
-                this.onItemRemoved(slot, get);
-                return get;
-            } else {
-                ItemStack ret = slots.get(slot).splitStack(number);
-                if (slots.get(slot).isEmpty()) {
-                    slots.set(slot, ItemStack.EMPTY);
-                    this.onItemRemoved(slot, ret);
-                }
-                return ret;
-            }
+    public @Nonnull ItemStack decrStackSize(int slot, int amount) {
+        ItemStack result = ItemStackHelper.getAndSplit(slots, slot, amount);
+        if (!result.isEmpty() && slots.get(slot).isEmpty()) {
+            onItemRemoved(slot, result);
         }
-        return ItemStack.EMPTY;
+        return result;
     }
 
     @Override
     public void setInventorySlotContents(int slot, @Nonnull ItemStack stack) {
-        if (slot >= 0 && slot < this.getSizeInventory()) {
+        if (slot >= 0 && slot < getSizeInventory()) {
             if (stack.isEmpty() && slots.get(slot).isEmpty()) return;
             if (!slots.get(slot).isEmpty() && !stack.isEmpty() && slots.get(slot) == stack) return;
 
@@ -102,9 +92,7 @@ public abstract class InventoryCartComponents implements IInventory, Environment
 
     @Override
     public ItemStack removeStackFromSlot(int slot) {
-        ItemStack old = getStackInSlot(slot); //FIXME copy?
-        setInventorySlotContents(slot, ItemStack.EMPTY);
-        return old;
+        return ItemStackHelper.getAndRemove(slots, slot);
     }
 
     @Override
@@ -126,7 +114,7 @@ public abstract class InventoryCartComponents implements IInventory, Environment
     public void clear() {
         for (int i = 0; i < slots.size(); i++) {
             ItemStack slot = slots.remove(i);
-            this.onItemRemoved(i, slot);
+            onItemRemoved(i, slot);
         }
     }
 
@@ -210,12 +198,12 @@ public abstract class InventoryCartComponents implements IInventory, Environment
     }
 
     public ManagedEnvironment getSlotComponent(int slot) {
-        if (slot < this.getSizeInventory()) return this.components[slot];
+        if (slot < getSizeInventory()) return this.components[slot];
         return null;
     }
 
     public void connectComponents() {
-        for (int slot = 0; slot < this.getSizeInventory(); slot += 1) {
+        for (int slot = 0; slot < getSizeInventory(); slot += 1) {
             ItemStack stack = this.getStackInSlot(slot);
             if (!stack.isEmpty() && this.components[slot] == null && this.isComponentSlot(slot, stack)) {
                 DriverItem drv = CustomDriver.driverFor(stack, host.getClass());

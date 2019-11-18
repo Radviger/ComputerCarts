@@ -78,7 +78,7 @@ public class ContainerComputerCart extends Container {
     @Override
     @Nonnull
     public ItemStack transferStackInSlot(EntityPlayer player, int slot) {
-        Slot s = this.getSlot(slot);
+        Slot s = getSlot(slot);
         if (s == null || !s.getHasStack()) return ItemStack.EMPTY;
         ItemStack stack = s.getStack();
         IntList a = getPlayerInvSlots(stack, player);

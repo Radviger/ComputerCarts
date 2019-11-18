@@ -85,9 +85,9 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
             EntityComputerCart cart = EntityComputerCart.this;
 
             if (!cart.world.isRemote) {
-                String slotType = this.getSlotType(slot);
+                String slotType = getSlotType(slot);
                 if (slotType.equals(Slot.Floppy)) {
-                    Sound$.MODULE$.playDiskInsert(this.host);
+                    Sound$.MODULE$.playDiskInsert(host);
                 }
             }
         }
@@ -98,10 +98,10 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
             EntityComputerCart cart = EntityComputerCart.this;
 
             if (!cart.world.isRemote) {
-                String slotType = this.getSlotType(slot);
+                String slotType = getSlotType(slot);
 
                 if (slotType.equals(Slot.Floppy)) {
-                    Sound$.MODULE$.playDiskEject(this.host);
+                    Sound$.MODULE$.playDiskEject(host);
                 }
             }
         }
@@ -109,10 +109,13 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
         @Override
         public void markDirty() {
             super.markDirty();
-            if (!EntityComputerCart.this.world().isRemote) {
+            EntityComputerCart cart = EntityComputerCart.this;
+
+            if (cart.world.isRemote) {
+                ModNetwork.CHANNEL.sendToServer(new MessageEntitySyncRequest(cart));
+            } else {
                 mainInventory.recalculateSize();
                 tanks.recalculateSize();
-                ModNetwork.CHANNEL.sendToServer(new MessageEntitySyncRequest(EntityComputerCart.this));
             }
         }
 
@@ -121,14 +124,14 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
             super.connectItemNode(node);
             if (node != null) {
                 if (node.host() instanceof TextBuffer) {
-                    for (int i = 0; i < this.getSizeInventory(); i += 1) {
-                        if ((this.getSlotComponent(i) instanceof Keyboard) && this.getSlotComponent(i).node() != null)
-                            node.connect(this.getSlotComponent(i).node());
+                    for (int i = 0; i < getSizeInventory(); i += 1) {
+                        if ((getSlotComponent(i) instanceof Keyboard) && getSlotComponent(i).node() != null)
+                            node.connect(getSlotComponent(i).node());
                     }
                 } else if (node.host() instanceof Keyboard) {
-                    for (int i = 0; i < this.getSizeInventory(); i += 1) {
-                        if ((this.getSlotComponent(i) instanceof TextBuffer) && this.getSlotComponent(i).node() != null)
-                            node.connect(this.getSlotComponent(i).node());
+                    for (int i = 0; i < getSizeInventory(); i += 1) {
+                        if ((getSlotComponent(i) instanceof TextBuffer) && getSlotComponent(i).node() != null)
+                            node.connect(getSlotComponent(i).node());
                     }
                 }
             }
@@ -422,14 +425,8 @@ public class EntityComputerCart extends EntityAdvancedCart implements MachineHos
     }
 
     @Override
-    public Type getType() {
-        return null;
-    }
-
-    @Override
     public ItemStack getCartItem() {
         ItemStack stack = new ItemStack(ModItems.COMPUTER_CART);
-
 
         Int2ObjectMap<ItemStack> components = new Int2ObjectOpenHashMap<>();
         for (int i = 0; i < 20; i += 1) {

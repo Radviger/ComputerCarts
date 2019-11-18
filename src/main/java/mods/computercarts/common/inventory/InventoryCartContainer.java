@@ -8,6 +8,7 @@ import mods.computercarts.common.minecart.EntityComputerCart;
 import mods.computercarts.common.util.ItemUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -43,17 +44,12 @@ public class InventoryCartContainer implements IInventory {
 
     @Override
     public ItemStack removeStackFromSlot(int slot) {
-        if (slot < this.getMaxSizeInventory()) {
-            ItemStack result = items.get(slot);
-            this.setInventorySlotContents(slot, ItemStack.EMPTY);
-            return result;
-        }
-        return ItemStack.EMPTY;
+        return ItemStackHelper.getAndRemove(items, slot);
     }
 
     @Override
     public boolean isUsableByPlayer(EntityPlayer player) {
-        return player.getDistanceSq(this.cart) <= 64 && !this.cart.isDead;
+        return player.getDistanceSq(cart) <= 64 && !cart.isDead;
     }
 
     @Override
@@ -119,41 +115,28 @@ public class InventoryCartContainer implements IInventory {
     @Override
     @Nonnull
     public ItemStack getStackInSlot(int slot) {
-        return slot < this.getMaxSizeInventory() ? this.items.get(slot) : ItemStack.EMPTY;
+        return slot < getMaxSizeInventory() ? items.get(slot) : ItemStack.EMPTY;
     }
 
     @Override
     @Nonnull
-    public ItemStack decrStackSize(int slot, int number) {
-        if (slot >= 0 && slot < this.getMaxSizeInventory()) {
-            if (number >= items.get(slot).getCount()) {
-                ItemStack get = items.get(slot);
-                items.set(slot, ItemStack.EMPTY);
-                this.slotChanged(slot);
-                return get;
-            } else {
-                ItemStack ret = items.get(slot).splitStack(number);
-                if (items.get(slot).isEmpty()) {
-                    items.set(slot, ItemStack.EMPTY);
-                }
-                this.slotChanged(slot);
-                return ret;
-            }
-        }
-        return ItemStack.EMPTY;
+    public ItemStack decrStackSize(int slot, int amount) {
+        ItemStack result = ItemStackHelper.getAndSplit(items, slot, amount);
+        slotChanged(slot);
+        return result;
     }
 
     @Override
     public void setInventorySlotContents(int slot, @Nonnull ItemStack stack) {
-        if (slot < this.getMaxSizeInventory()) {
+        if (slot < getMaxSizeInventory()) {
             items.set(slot, stack);
-            this.slotChanged(slot);
+            slotChanged(slot);
         }
     }
 
     //This is the same as setInventorySlotContents but will not send a Signal to the machine;
     private void updateSlotContents(int slot, @Nonnull ItemStack stack) {
-        if (slot < this.getMaxSizeInventory()) {
+        if (slot < getMaxSizeInventory()) {
             items.set(slot, stack);
         }
     }
@@ -165,10 +148,10 @@ public class InventoryCartContainer implements IInventory {
 
     @Override
     public void markDirty() {
-        for (int i = 0; i < this.getSizeInventory(); i += 1) {
-            ItemStack stack = this.getStackInSlot(i);
-            if (!stack.isEmpty()) {
-                this.updateSlotContents(i, ItemStack.EMPTY);
+        for (int i = 0; i < getSizeInventory(); i += 1) {
+            ItemStack stack = getStackInSlot(i);
+            if (stack.isEmpty()) {
+                updateSlotContents(i, ItemStack.EMPTY);
             }
         }
     }
@@ -217,14 +200,14 @@ public class InventoryCartContainer implements IInventory {
             if (!components.getStackInSlot(i).isEmpty()) {
                 ItemStack stack = components.getStackInSlot(i);
                 DriverItem drv = CustomDriver.driverFor(stack, cart.getClass());
-                if (drv instanceof Inventory && this.size < this.getMaxSizeInventory()) {
-                    this.size = this.size + ((Inventory) drv).inventoryCapacity(stack);
-                    if (this.size > this.getMaxSizeInventory())
-                        this.size = this.getMaxSizeInventory();
+                if (drv instanceof Inventory && size < getMaxSizeInventory()) {
+                    size += ((Inventory) drv).inventoryCapacity(stack);
+                    if (size > getMaxSizeInventory())
+                        size = getMaxSizeInventory();
                 }
             }
         }
-        Iterable<ItemStack> over = this.removeOverflowItems(this.size);
+        Iterable<ItemStack> over = removeOverflowItems(size);
         ItemUtil.dropItems(over, cart.world, cart.posX, cart.posY, cart.posZ, true);
     }
 
