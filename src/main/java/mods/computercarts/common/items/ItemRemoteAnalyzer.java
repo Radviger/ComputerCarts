@@ -36,7 +36,7 @@ public class ItemRemoteAnalyzer extends Item implements ItemEntityInteract {
     public ItemRemoteAnalyzer() {
         super();
         this.setMaxStackSize(1);
-        this.setUnlocalizedName(ComputerCarts.MODID + ".remote_analyzer");
+        this.setTranslationKey(ComputerCarts.MODID + ".remote_analyzer");
         this.setRegistryName("remote_analyzer");
     }
 

@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
         maven {
             name = 'forge'
-            url = "http://files.minecraftforge.net/maven" 
+            url = "https://files.minecraftforge.net/maven"
         }
     }
     dependencies {
@@ -16,8 +16,6 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'idea'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-version = project.property("version")
-group = project.property("group") // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = project.modid
 
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
@@ -26,9 +24,9 @@ compileJava {
 }
 
 minecraft {
-    version = project.forge_version
+    version = project.minecraft_version + '-' + project.forge_version
     runDir = "run"
-    
+
     // the mappings can be changed at any time, and must be in the following format.
     // snapshot_YYYYMMDD   snapshot are built nightly.
     // stable_#            stables are built at the discretion of the MCP team.
@@ -41,62 +39,58 @@ minecraft {
 }
 
 runClient {
+    jvmArgs '-Dfml.coreMods.load=li.cil.oc.common.launch.TransformerLoader'
     args '--username', project.username
 }
 
 repositories {
+    maven {
+        name = "OpenComputers"
+        url = "http://maven.cil.li/"
+    }
+    maven {
+        name = 'jei maven'
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        name = 'mod maven'
+        url = "https://modmaven.k-4u.nl"
+    }
     mavenCentral()
-    maven { url = "http://maven.cil.li/" }
-    maven {
-        // location of the maven that hosts JEI files
-        name = "Progwml6 maven"
-        url = "http://dvs1.progwml6.com/files/maven"
-    }
-    maven {
-        // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
-        url = "modmaven.k-4u.nl"
-    }
 }
 
 dependencies {
-    compile "li.cil.oc:OpenComputers:MC${minecraft_version}-${oc_version}"
-    compile "mezz.jei:jei_${minecraft_version}:${jei_version}"
-    // you may put jars on which you depend on in ./libs
-    // or you may define them like so..
-    //compile "some.group:artifact:version:classifier"
-    //compile "some.group:artifact:version"
-      
-    // real examples
-    //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
-    //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
-
-    // the 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
-    //provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-
-    // the deobf configurations:  'deobfCompile' and 'deobfProvided' are the same as the normal compile and provided,
-    // except that these dependencies get remapped to your current MCP mappings
-    //deobfCompile 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-    //deobfProvided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
-
-    // for more info...
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+    deobfCompile "li.cil.oc:OpenComputers:MC${project.minecraft_version}-${project.oc_version}"
+    runtime "li.cil.oc:OpenComputers:MC${project.minecraft_version}-${project.oc_version}"
+    deobfCompile ("appeng:appliedenergistics2:${project.ae2_version}") {
+        exclude module: "buildcraft"
+        exclude module: "industrialcraft-2"
+        exclude module: "BetterStorage"
+        exclude module: "RotaryCraft"
+    }
+    runtime ("appeng:appliedenergistics2:${project.ae2_version}") {
+        exclude module: "buildcraft"
+        exclude module: "industrialcraft-2"
+        exclude module: "BetterStorage"
+        exclude module: "RotaryCraft"
+    }
+    deobfCompile "mezz.jei:jei_${project.minecraft_version}:${project.jei_version}:api"
+    runtime "mezz.jei:jei_${project.minecraft_version}:${project.jei_version}"
 }
 
 processResources {
     // this will ensure that this task is redone when the versions change.
     inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft_version
+    inputs.property "mcversion", project.minecraft.version
 
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-                
+
         // replace version and mcversion
-        expand 'mod_version': project.version, 'mod_id': project.modid, 'mc_version': project.minecraft_version
+        expand 'version': project.version, 'mcversion': project.minecraft.version
     }
-        
+
     // copy everything else except the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'

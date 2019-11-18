@@ -211,7 +211,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint {
     public void update() {
         if (this.world().isRemote) return;
         boolean hasEntity = world.loadedEntityList.contains(this.entity);
-        boolean chunkLoaded = world.getChunkFromChunkCoords((int) entity.posX >> 4, (int) entity.posZ >> 4).isLoaded();
+        boolean chunkLoaded = world.getChunk((int) entity.posX >> 4, (int) entity.posZ >> 4).isLoaded();
         if (this.entity.isDead || this.entity.getDamage() >= this.getMaxModuleDamage()) {
             this.setEnabled(false, true);
             if (this.entity.getDamage() >= this.getMaxModuleDamage()) {
@@ -256,7 +256,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint {
             usePassword = true;
         } else if (packet.data().length > 2 && packet.data()[1] instanceof byte[]) {
             String passw = new String((byte[]) packet.data()[1], Charsets.UTF_8);
-            if (passw.length() >= 2 || passw.substring(0, 2).equals("::"))
+            if (passw.length() >= 2 && passw.substring(0, 2).equals("::"))
                 usePassword = true;
         }
 

@@ -17,7 +17,7 @@ public class ComputerCartCase extends Item {
     ComputerCartCase() {
         super();
         this.setHasSubtypes(true);
-        this.setUnlocalizedName(ComputerCarts.MODID + ".computer_cart_case");
+        this.setTranslationKey(ComputerCarts.MODID + ".computer_cart_case");
         this.setRegistryName("computer_cart_case");
         this.setMaxStackSize(1);
     }

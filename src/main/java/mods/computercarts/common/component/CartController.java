@@ -363,9 +363,9 @@ public class CartController implements ManagedEnvironment {
 
         EnumFacing dir = this.cart.toGlobal(side);
 
-        int x = (int) Math.floor(this.cart.xPosition()) + dir.getFrontOffsetX();
-        int y = (int) Math.floor(this.cart.yPosition()) + dir.getFrontOffsetY();
-        int z = (int) Math.floor(this.cart.zPosition()) + dir.getFrontOffsetZ();
+        int x = (int) Math.floor(this.cart.xPosition()) + dir.getXOffset();
+        int y = (int) Math.floor(this.cart.yPosition()) + dir.getYOffset();
+        int z = (int) Math.floor(this.cart.zPosition()) + dir.getZOffset();
 
         BlockPos pos = new BlockPos(x, y, z);
 
@@ -405,9 +405,9 @@ public class CartController implements ManagedEnvironment {
         if (amount < 1) return new Object[]{false};
 
         EnumFacing dir = this.cart.toGlobal(side);
-        int x = (int) Math.floor(this.cart.xPosition()) + dir.getFrontOffsetX();
-        int y = (int) Math.floor(this.cart.yPosition()) + dir.getFrontOffsetY();
-        int z = (int) Math.floor(this.cart.zPosition()) + dir.getFrontOffsetZ();
+        int x = (int) Math.floor(this.cart.xPosition()) + dir.getXOffset();
+        int y = (int) Math.floor(this.cart.yPosition()) + dir.getYOffset();
+        int z = (int) Math.floor(this.cart.zPosition()) + dir.getZOffset();
 
         BlockPos pos = new BlockPos(x, y, z);
 
@@ -453,9 +453,9 @@ public class CartController implements ManagedEnvironment {
             return new Object[]{false, "no tank selected"};
 
         EnumFacing dir = this.cart.toGlobal(side);
-        int x = (int) Math.floor(this.cart.xPosition()) + dir.getFrontOffsetX();
-        int y = (int) Math.floor(this.cart.yPosition()) + dir.getFrontOffsetY();
-        int z = (int) Math.floor(this.cart.zPosition()) + dir.getFrontOffsetZ();
+        int x = (int) Math.floor(this.cart.xPosition()) + dir.getXOffset();
+        int y = (int) Math.floor(this.cart.yPosition()) + dir.getYOffset();
+        int z = (int) Math.floor(this.cart.zPosition()) + dir.getZOffset();
 
         BlockPos pos = new BlockPos(x, y, z);
 
@@ -476,9 +476,9 @@ public class CartController implements ManagedEnvironment {
             return new Object[]{false, "no tank selected"};
 
         EnumFacing dir = this.cart.toGlobal(side);
-        int x = (int) Math.floor(this.cart.xPosition()) + dir.getFrontOffsetX();
-        int y = (int) Math.floor(this.cart.yPosition()) + dir.getFrontOffsetY();
-        int z = (int) Math.floor(this.cart.zPosition()) + dir.getFrontOffsetZ();
+        int x = (int) Math.floor(this.cart.xPosition()) + dir.getXOffset();
+        int y = (int) Math.floor(this.cart.yPosition()) + dir.getYOffset();
+        int z = (int) Math.floor(this.cart.zPosition()) + dir.getZOffset();
 
         BlockPos pos = new BlockPos(x, y, z);
 
@@ -512,9 +512,9 @@ public class CartController implements ManagedEnvironment {
             return new Object[]{false, "no tank selected"};
 
         EnumFacing dir = this.cart.toGlobal(side);
-        int x = (int) Math.floor(this.cart.xPosition()) + dir.getFrontOffsetX();
-        int y = (int) Math.floor(this.cart.yPosition()) + dir.getFrontOffsetY();
-        int z = (int) Math.floor(this.cart.zPosition()) + dir.getFrontOffsetZ();
+        int x = (int) Math.floor(this.cart.xPosition()) + dir.getXOffset();
+        int y = (int) Math.floor(this.cart.yPosition()) + dir.getYOffset();
+        int z = (int) Math.floor(this.cart.zPosition()) + dir.getZOffset();
 
         BlockPos pos = new BlockPos(x, y, z);
 

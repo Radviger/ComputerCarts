@@ -34,7 +34,7 @@ public class ComputerCarts {
 
     public static CreativeTabs TAB = new CreativeTabs(ComputerCarts.MODID) {
         @Override
-        public ItemStack getTabIconItem() {
+        public ItemStack createIcon() {
             return new ItemStack(ModItems.COMPUTER_CART_CASE);
         }
     };

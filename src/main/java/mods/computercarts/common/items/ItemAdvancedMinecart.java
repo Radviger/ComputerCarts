@@ -26,9 +26,9 @@ public class ItemAdvancedMinecart extends Item {
         public ItemStack dispenseStack(IBlockSource source, ItemStack item) {
             EnumFacing side = source.getBlockState().getValue(BlockDispenser.FACING);
             World world = source.getWorld();
-            double d0 = source.getX() + (double) ((float) side.getFrontOffsetX() * 1.125F);
-            double d1 = source.getY() + (double) ((float) side.getFrontOffsetY() * 1.125F);
-            double d2 = source.getZ() + (double) ((float) side.getFrontOffsetZ() * 1.125F);
+            double d0 = source.getX() + (double) ((float) side.getXOffset() * 1.125F);
+            double d1 = source.getY() + (double) ((float) side.getYOffset() * 1.125F);
+            double d2 = source.getZ() + (double) ((float) side.getZOffset() * 1.125F);
             BlockPos pos = source.getBlockPos().offset(side);
             IBlockState state = world.getBlockState(pos);
             double offset;

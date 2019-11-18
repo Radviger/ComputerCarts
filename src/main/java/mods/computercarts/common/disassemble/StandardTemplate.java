@@ -10,7 +10,7 @@ public class StandardTemplate {
     public static boolean select(ItemStack stack) {
         Item item = stack.getItem();
         if (isOnBlacklist(item)) return false;
-        return item.getRegistryName().getResourceDomain().equalsIgnoreCase(ComputerCarts.MODID);
+        return item.getRegistryName().getNamespace().equalsIgnoreCase(ComputerCarts.MODID);
     }
 
     public static ItemStack[] disassemble(ItemStack stack, ItemStack[] ingredients) {

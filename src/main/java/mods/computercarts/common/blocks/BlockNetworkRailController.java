@@ -21,7 +21,7 @@ public class BlockNetworkRailController extends BlockContainer {
 
     protected BlockNetworkRailController() {
         super(Material.IRON);
-        this.setUnlocalizedName(ComputerCarts.MODID + ".network_rail_controller");
+        this.setTranslationKey(ComputerCarts.MODID + ".network_rail_controller");
         this.setRegistryName("network_rail_controller");
         this.setHardness(2F);
         this.setResistance(5f);

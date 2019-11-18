@@ -42,8 +42,8 @@ public class RenderComputerCart extends Render<EntityComputerCart> {
 
         if (vec1 != null && vec2 != null) {
             y += (vec1.y + vec2.y) / 2 - cy;
-            Vec3d vec3 = vec2.addVector(-vec1.x, -vec1.y, -vec1.z);
-            if (vec3.lengthVector() != 0) {
+            Vec3d vec3 = vec2.add(-vec1.x, -vec1.y, -vec1.z);
+            if (vec3.length() != 0) {
                 yaw = (float) (Math.atan2(vec3.z, vec3.x) * 180 / Math.PI);
                 pitch = (float) (Math.atan(vec3.y) * 73);
             }

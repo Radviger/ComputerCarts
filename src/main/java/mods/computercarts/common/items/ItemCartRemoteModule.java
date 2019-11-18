@@ -42,7 +42,7 @@ public class ItemCartRemoteModule extends Item implements ItemEntityInteract {
     public ItemCartRemoteModule() {
         super();
         this.setMaxStackSize(64);
-        this.setUnlocalizedName(ComputerCarts.MODID + ".remote_module");
+        this.setTranslationKey(ComputerCarts.MODID + ".remote_module");
         this.setRegistryName("remote_module");
         this.setHasSubtypes(true);
         if (FMLCommonHandler.instance().getEffectiveSide().isServer()) range = Settings.RemoteRange;

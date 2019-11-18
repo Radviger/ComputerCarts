@@ -31,7 +31,7 @@ import java.util.List;
 
 public class ItemComputerCart extends ItemAdvancedMinecart implements ComponentInventoryItem {
     public ItemComputerCart() {
-        this.setUnlocalizedName(ComputerCarts.MODID + ".computer_cart");
+        this.setTranslationKey(ComputerCarts.MODID + ".computer_cart");
         this.setRegistryName("computer_cart");
         this.setHasSubtypes(true);
     }

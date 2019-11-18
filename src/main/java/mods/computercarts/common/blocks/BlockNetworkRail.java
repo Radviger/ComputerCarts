@@ -19,7 +19,7 @@ public class BlockNetworkRail extends BlockRailBase implements NetRail {
 
     protected BlockNetworkRail() {
         super(false);
-        this.setUnlocalizedName(ComputerCarts.MODID + ".network_rail");
+        this.setTranslationKey(ComputerCarts.MODID + ".network_rail");
         this.setRegistryName("network_rail");
         this.setHardness(0.7F);
     }

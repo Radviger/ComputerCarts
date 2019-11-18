@@ -21,7 +21,7 @@ public class ItemLinkingUpgrade extends Item {
     public ItemLinkingUpgrade() {
         super();
         this.setMaxStackSize(64);
-        this.setUnlocalizedName(ComputerCarts.MODID + ".linking_upgrade");
+        this.setTranslationKey(ComputerCarts.MODID + ".linking_upgrade");
         this.setRegistryName("linking_upgrade");
         this.setHasSubtypes(true);
     }
